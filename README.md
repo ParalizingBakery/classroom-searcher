@@ -6,6 +6,6 @@ The most frustrating part of developing the extension is making sure the search 
 
 Injecting search when user first enters website will only afffect the first "page". Search will not show up in second page when if user navigates from home to archived and vice versa. Search will not show on any page at all if user starts from a class/to-do/assignment/etc. page. Refreshing will reload document and the current page will become the first (have search).
 
-This extension's approach is to add a `[mutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver)` to look for changes to childList of the `<body>`. A new `<c-wiz>` will trigger the observer, and so will other new/removed elements. It doesn't happen too often (<10 records per page load) so it is acceptable. The callback function will check all lists of classrooms and see whether it already has search.
+This extension's approach is to add a [mutationObserver](https://developer.mozilla.org/en-US/docs/Web/API/MutationObserver) to look for changes to childList of the `<body>`. A new `<c-wiz>` will trigger the observer, and so will other new/removed elements. It doesn't happen too often (<10 records per page load) so it is acceptable. The callback function will check all lists of classrooms and see whether it already has search.
 
 Created by Wuttiphat Kiddee
