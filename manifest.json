@@ -6,7 +6,6 @@
     "action": {
       "default_popup": "popup/index.html"
     },
-    "minimum_chrome_version": "93",
     "content_scripts": [
         {
             "js": [
