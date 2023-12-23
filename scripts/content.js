@@ -29,23 +29,25 @@ legend {
 function main(){
     const observer = new MutationObserver((record) => {
         //record is iterable, if you want to do smth for each mutaition please use for .. of ..
+        //doing this for every mutation in record is redundant for now
         injectSearch()
     })
-    //this is to find when new child is added/removed to body
+    //GC adds a new <c-wiz> element when you navigate to a new page (part?) of the website.
+    //there may or may not be a new <c-wiz> with roomList everytime observer is triggered
     observer.observe(document.querySelector("body"), {childList: true})
 }
 
 function injectSearch() {
+    //home and archived page will have "roomList"
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
         //see if already have search
         if (roomList.parentElement.querySelector(".searchapp") !== null) {
             return
         }
-
         roomList.insertAdjacentHTML("beforebegin", html)
         let searchBar = document.querySelector("#searchRoom")
-        document.addEventListener("keyup", function(event){
+        document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
                 searchBar.focus()
             }
