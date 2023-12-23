@@ -18,7 +18,7 @@ legend {
 <div class="searchbar">
 <form>
 <legend> Search using <strong>class name </strong> or <strong>teacher name</strong></legend>
-<legend>/ to focus</legend>
+<legend>/ to focus, Tab + Enter for first result</legend>
 <input id="searchRoom" type="search" autofocus>
 <button type="submit" disabled style="display: none" aria-hidden="true"></button>
 </form>
@@ -46,7 +46,8 @@ function injectSearch() {
             return
         }
         roomList.insertAdjacentHTML("beforebegin", html)
-        let searchBar = document.querySelector("#searchRoom")
+
+        let searchBar = roomList.parentElement.querySelector("#searchRoom")
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
                 searchBar.focus()
