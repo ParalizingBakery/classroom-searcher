@@ -1,0 +1,20 @@
+{
+    "manifest_version" : 3,
+    "name": "Classroom Searcher",
+    "description": "Searches GC for classes",
+    "version": "3.2",
+    "action": {
+      "default_popup": "popup/index.html"
+    },
+    "minimum_chrome_version": "93",
+    "content_scripts": [
+        {
+            "js": [
+                "/scripts/content.js"
+            ],
+            "matches": [
+                "https://classroom.google.com/u/*"
+            ]
+        }
+    ]
+}
