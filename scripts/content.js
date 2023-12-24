@@ -3,6 +3,7 @@ const roomNodeSelector = "li.gHz6xd.Aopndd.rZXyy"
 const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
 const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
 
+//if class of element is changed, also change selector in code
 const html = `
 <div class="searchapp">
 <style>
@@ -61,7 +62,12 @@ function injectSearch() {
 
 function matchRoom(element, input) {
     let roomName = element.querySelector(roomNameSelector).textContent.toLowerCase()
-    let roomTeacher = element.querySelector(roomTeacherSelector).textContent.toLowerCase()
+    let roomTeacherNode = element.querySelector(roomTeacherSelector)
+    let roomTeacher = ""
+    //roomTeacher does not exist when using as teacher 
+    if (roomTeacherNode) {
+        roomTeacher = roomTeacherNode.textContent.toLowerCase()
+    }
     if (roomName.includes(input) || roomTeacher.includes(input)) {
         element.style.display = 'flex'       
     } else {
