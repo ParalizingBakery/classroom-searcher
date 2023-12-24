@@ -1,6 +1,8 @@
 # gc-searcher
 An extension that lets users search classes in Google Classroom. Searching uses class name and teacher name. Available on home page and archived page.
 
+Searching with teacher name is not supported if the user is a teacher.
+
 ## How the Google Classroom website works
 The most frustrating part of developing the extension is making sure the search loads on the home page and the archive page. This is because Google classroom is a single page website. When the user first enters the website, their view is in a `<c-wiz>` element. When the user navigates to a different place, an another `<c-wiz>` is inserted in the body with the old element remaining but invisible. Returning to the old page reuses the c-wiz and search will still be there. There there is a limit to how many new pages you can load before the old one gets removed.
 
