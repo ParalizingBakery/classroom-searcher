@@ -46,13 +46,22 @@ function injectSearch() {
         if (roomList.parentElement.querySelector(".searchapp") !== null) {
             return
         }
-        roomList.insertAdjacentHTML("beforebegin", html)
-
+        roomList.insertAdjacentHTML("beforebegin", html)  
         let searchBar = roomList.parentElement.querySelector("#searchRoom")
+
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
+                //This checks whether home page is hidden. When creating a new class as teacher,
+                //user stays on the same <c-wiz>, but the creation pop-up makes page aria-hidden.
+                //pressing / in creation popup will focus the drarkend searchbar.
+                for (let element = roomList; element !== null; element = element.parentElement) {
+                    if (element.getAttribute("aria-hidden") === "true") {
+                        return
+                    }
+                }
                 searchBar.focus()
             }
+
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
             roomNodes.forEach((element) => matchRoom(element, input))
@@ -60,18 +69,19 @@ function injectSearch() {
     })  
 }
 
-function matchRoom(element, input) {
-    let roomName = element.querySelector(roomNameSelector).textContent.toLowerCase()
-    let roomTeacherNode = element.querySelector(roomTeacherSelector)
+function matchRoom(roomNode, input) {
+    let roomName = roomNode.querySelector(roomNameSelector).textContent.toLowerCase()
+    let roomTeacherNode = roomNode.querySelector(roomTeacherSelector)
     let roomTeacher = ""
     //roomTeacher does not exist when using as teacher 
     if (roomTeacherNode) {
         roomTeacher = roomTeacherNode.textContent.toLowerCase()
     }
+
     if (roomName.includes(input) || roomTeacher.includes(input)) {
-        element.style.display = 'flex'       
+        roomNode.style.display = 'flex'       
     } else {
-        element.style.display = 'none'
+        roomNode.style.display = 'none'
     }
 }
 
