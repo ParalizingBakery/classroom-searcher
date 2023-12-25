@@ -28,11 +28,9 @@ legend {
 `
 
 function main(){
-    const observer = new MutationObserver((record) => {
-        //record is iterable, if you want to do smth for each mutaition please use for .. of ..
-        //doing this for every mutation in record is redundant for now
-        injectSearch()
-    })
+    //the parameter for callback is iterable, if you want to do smth for each mutaition please use for .. of ..
+    //doing this for every mutation in record is redundant for now
+    const observer = new MutationObserver(injectSearch)
     //GC adds a new <c-wiz> element when you navigate to a new page (part?) of the website.
     //there may or may not be a new <c-wiz> with roomList everytime observer is triggered
     observer.observe(document.querySelector("body"), {childList: true})
