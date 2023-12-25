@@ -15,5 +15,14 @@
                 "https://classroom.google.com/u/*"
             ]
         }
-    ]
+    ],
+    "icons": {
+        "48": "/icons/gc-48.png",
+        "96": "/icons/gc-96.png"
+    },
+    "browser_specific_settings": {
+        "gecko": {
+          "id": "gc-searcher@mozilla.org"
+        }
+    }
 }
