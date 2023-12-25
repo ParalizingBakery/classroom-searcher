@@ -51,7 +51,7 @@ function injectSearch() {
             if (event.key == "/") {
                 //This checks whether home page is hidden. When creating a new class as teacher,
                 //user stays on the same <c-wiz>, but the creation pop-up makes page aria-hidden.
-                //pressing / in creation popup will focus the drarkend searchbar.
+                //pressing / in creation popup will focus the darkened searchbar.
                 for (let element = roomList; element !== null; element = element.parentElement) {
                     if (element.getAttribute("aria-hidden") === "true") {
                         return
