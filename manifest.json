@@ -2,7 +2,7 @@
     "manifest_version" : 3,
     "name": "Classroom Searcher",
     "description": "Searches GC for classes",
-    "version": "3.3",
+    "version": "3.4",
     "action": {
       "default_popup": "popup/index.html"
     },
