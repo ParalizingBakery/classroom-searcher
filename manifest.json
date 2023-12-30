@@ -12,7 +12,8 @@
                 "/scripts/content.js"
             ],
             "matches": [
-                "https://classroom.google.com/u/*"
+                "https://classroom.google.com/u/*",
+                "https://classroom.google.com/h"
             ]
         }
     ],
@@ -22,7 +23,7 @@
     },
     "browser_specific_settings": {
         "gecko": {
-          "id": "gc-searcher@mozilla.org"
+          "id": "gc-searcher@wuttiphat.dev"
         }
     }
 }
