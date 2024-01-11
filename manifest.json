@@ -1,7 +1,7 @@
 {
     "manifest_version" : 3,
     "name": "Classroom Searcher",
-    "description": "An extension that lets students and teachers search classes they enrolled in Google Classroom.",
+    "description": "Search classes you enrolled or teach in Google Classroom.",
     "version": "3.6",
     "action": {
       "default_popup": "popup/index.html"
