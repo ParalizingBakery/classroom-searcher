@@ -1,7 +1,7 @@
 {
     "manifest_version" : 3,
     "name": "Classroom Searcher",
-    "description": "An extension that lets students and teachers search classes they enrolled in Google Classroom. Available on home page and archived page.\nHelps you save time by filtering out classes that don't match what you've typed in the search bar. Matches with class name and teacher name. \nSearching with teacher name is not supported if the user is a teacher. \nAll data is stored locally and deleted after closing the tab. \nMade by: Wuttiphat Kiddee\nThe Author has no affiliation with Google.\nExtension is provided \"as is\" without warranty",
+    "description": "An extension that lets students and teachers search classes they enrolled in Google Classroom.",
     "version": "3.6",
     "action": {
       "default_popup": "popup/index.html"
