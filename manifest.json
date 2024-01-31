@@ -1,8 +1,8 @@
 {
     "manifest_version" : 3,
-    "name": "Classroom Searcher",
+    "name": "Classroom Searcher For Google Classroom",
     "description": "Search classes you enrolled or teach in Google Classroom.",
-    "version": "3.6",
+    "version": "3.7",
     "action": {
       "default_popup": "popup/index.html"
     },
