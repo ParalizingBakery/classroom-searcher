@@ -44,13 +44,14 @@ function injectSearch() {
         if (roomList.parentElement.querySelector(".searchapp") !== null) {
             return
         }
+        
         roomList.insertAdjacentHTML("beforebegin", html)  
         let searchBar = roomList.parentElement.querySelector("#searchRoom")
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
                 //This checks whether home page is hidden. When creating a new class as teacher,
-                //user stays on the same <c-wiz>, but the creation pop-up makes page aria-hidden.
+                //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
                 //pressing / in creation popup will focus the darkened searchbar.
                 for (let element = roomList; element !== null; element = element.parentElement) {
                     if (element.getAttribute("aria-hidden") === "true") {
@@ -60,6 +61,7 @@ function injectSearch() {
                 searchBar.focus()
             }
 
+            //Match rooms with input
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
             roomNodes.forEach((element) => matchRoom(element, input))
