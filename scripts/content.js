@@ -3,7 +3,7 @@ const roomNodeSelector = "li.gHz6xd.Aopndd.rZXyy"
 const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
 const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
 
-//if class of element is changed, also change selector in code
+//if class or id of element is changed, also change selector in injectsearch()
 const html = `
 <div class="searchapp">
 <style>
