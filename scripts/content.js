@@ -58,8 +58,10 @@ function injectSearch() {
                 //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
                 //pressing / in creation popup will focus the darkened searchbar.
                 for (let element = roomList; element !== null; element = element.parentElement) {
-                    if (element.getAttribute("aria-hidden") === "true") {
-                        return
+                    if (element.tagName === "c-wiz") {
+                        if (element.getAttribute("aria-hidden") === "true") {
+                            return //Do not focus searchbar
+                        }
                     }
                 }
                 searchBar.focus()
