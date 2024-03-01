@@ -64,7 +64,7 @@ function injectSearch() {
                 //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
                 //pressing / in creation popup will focus the darkened searchbar.
                 for (let element = roomList; element !== null; element = element.parentElement) {
-                    if (element.tagName === "c-wiz") {
+                    if (element.tagName.toLowerCase() === "c-wiz") {
                         if (element.getAttribute("aria-hidden") === "true") {
                             return //Do not focus searchbar
                         }
@@ -80,6 +80,14 @@ function injectSearch() {
         })
     })  
 }
+
+/**
+ * Matches a string input with the room name and teacher name of a Google Classroom li element that contains each room.
+ * 
+ * @param {HTMLLIElement} roomNode 
+ * @param {string} input
+ * 
+ */
 
 function matchRoom(roomNode, input) {
     let roomNameNode = roomNode.querySelector(roomNameSelector)
@@ -100,6 +108,28 @@ function matchRoom(roomNode, input) {
     } else {
         roomNode.style.display = 'none'
     }
+}
+
+/**
+ * Given an element, the function will loop through the element's parents 
+ * until it finds the first parent element with the provided tag.
+ * 
+ * This function checks the tag of the starting element.
+ * 
+ * This function converts the parent element's tag name to lowercase.
+ * 
+ * @param {HTMLElement} firstElement - Element to start the loop from
+ * @param {string} tag - Tag of the desired parent element in lowercase
+ * 
+ * @returns {HTMLElement|null} 
+ */
+function getParentByTag(firstElement, tag) {
+    for (let element = firstElement; element !== null; element = element.parentElement) {
+        if (element.tagName.toLowerCase() === tag) {
+            return element
+        }
+    }
+    return null
 }
 
 main()
