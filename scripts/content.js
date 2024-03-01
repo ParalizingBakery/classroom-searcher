@@ -1,29 +1,33 @@
+//May change when Google Classroom updates UI
 const roomListSelector = ".JwPp0e"
 const roomNodeSelector = "li.gHz6xd.Aopndd.rZXyy"
 const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
 const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
 
-//if class or id of element is changed, also change selector in injectsearch()
-const html = `
-<div class="searchapp">
-<style>
-.searchapp {
-    margin-left: 1.5rem;
-    margin-top: 1.5rem;
-}
+//Classes and Id for elements in html that is queried in code
+const searchappClass = "searchapp"
+const inputbarId = "searchbar"
 
-legend {
-    font-size: 1rem;
-}
-</style>
-<div class="searchbar">
-<form>
-<legend> Search using <strong>class name </strong> or <strong>teacher name</strong></legend>
-<legend>/ to focus, Tab + Enter for first result</legend>
-<input id="searchRoom" type="search" autofocus>
-<button type="submit" disabled style="display: none" aria-hidden="true"></button>
-</form>
-</div>
+//if class or id of element is changed, also change selector in injectsearch()
+//disabled button in form to prevent submitting form when pressing enter
+const html = `
+<div class="${searchappClass}">
+    <style>
+    .${searchappClass} {
+        margin-left: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    legend {
+        font-size: 1rem;
+    }
+    </style>
+    <form>
+    <legend> Search using <strong>class name </strong> or <strong>teacher name</strong></legend>
+    <legend>/ to focus, Tab + Enter for first result</legend>
+    <input id="${inputbarId}" type="search" autofocus>
+    <button type="submit" disabled style="display: none" aria-hidden="true"></button>
+    </form>
 </div>
 `
 
@@ -41,12 +45,12 @@ function injectSearch() {
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
         //see if already have search
-        if (roomList.parentElement.querySelector(".searchapp") !== null) {
+        if (roomList.parentElement.querySelector("." + searchappClass) !== null) {
             return
         }
         
         roomList.insertAdjacentHTML("beforebegin", html)  
-        let searchBar = roomList.parentElement.querySelector("#searchRoom")
+        let searchBar = roomList.parentElement.querySelector("#" + inputbarId)
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
