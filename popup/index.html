@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <script type="module" src="browser-polyfill.js"></script>
+        <script src="permissions.js" defer></script>
         <link href="style.css" rel="stylesheet">
     </head>
     <body>
@@ -10,6 +12,10 @@
         Available on <strong>home page</strong> and <strong>archived page</strong>.
         Searching with teacher name is not supported if the user is a teacher.
         </p>
+        <p>
+        If you are on Firefox, the permission to edit Google Classroom is not granted automatically.
+        </p>
+        <button id="permission-button" type="button" autocomplete="off">Grant Permission</button>
         <p>Made by: Wuttiphat Kiddee</p>
         <p>See <a href="https://github.com/ParalizingBakery/gc-searcher">https://github.com/ParalizingBakery/gc-searcher</a></p>
     </body>
