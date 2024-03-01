@@ -26,7 +26,7 @@ const html = `
     </style>
     <form>
     <legend> Search using 
-    <input type="checkbox" id="${classCheckboxId} checked"></input>
+    <input type="checkbox" id="${classCheckboxId}" checked></input>
     <strong>Class name </strong> or
     <input type="checkbox" id="${teacherCheckboxId}" checked></input>
     <strong>Teacher name</strong></legend>
@@ -101,7 +101,11 @@ function matchRoom(roomNode, input) {
         roomName = roomNameNode.textContent.toLowerCase()
     }
 
-    if (roomName.includes(input) || roomTeacher.includes(input)) {
+    let page = getParentByTag(roomNode, "c-wiz")
+    let matchRoom = page.querySelector("#" + classCheckboxId).checked
+    let matchTeacher = page.querySelector("#" + teacherCheckboxId).checked
+
+    if ((roomName.includes(input) && matchRoom) || (roomTeacher.includes(input) && matchTeacher)) {
         roomNode.style.display = 'flex'       
     } else {
         roomNode.style.display = 'none'
