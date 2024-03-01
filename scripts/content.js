@@ -82,12 +82,17 @@ function injectSearch() {
 }
 
 function matchRoom(roomNode, input) {
-    let roomName = roomNode.querySelector(roomNameSelector).textContent.toLowerCase()
+    let roomNameNode = roomNode.querySelector(roomNameSelector)
     let roomTeacherNode = roomNode.querySelector(roomTeacherSelector)
     let roomTeacher = ""
-    //roomTeacher does not exist when using as teacher 
+    let roomName = ""
+
+    //roomTeacher does not exist when using as teacher
     if (roomTeacherNode) {
         roomTeacher = roomTeacherNode.textContent.toLowerCase()
+    }
+    if (roomNameNode) {
+        roomName = roomNameNode.textContent.toLowerCase()
     }
 
     if (roomName.includes(input) || roomTeacher.includes(input)) {
