@@ -5,15 +5,17 @@ const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
 const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
 
 //Classes and Id for elements in html that is queried in code
-const searchappClass = "searchapp"
-const inputbarId = "searchbar"
+const searchAppClass = "searchapp"
+const inputBarId = "searchbar"
+const classCheckboxId = "classCheckbox"
+const teacherCheckboxId = "teacherCheckbox"
 
 //if class or id of element is changed, also change selector in injectsearch()
 //disabled button in form to prevent submitting form when pressing enter
 const html = `
-<div class="${searchappClass}">
+<div class="${searchAppClass}">
     <style>
-    .${searchappClass} {
+    .${searchAppClass} {
         margin-left: 1.5rem;
         margin-top: 1.5rem;
     }
@@ -23,9 +25,13 @@ const html = `
     }
     </style>
     <form>
-    <legend> Search using <strong>class name </strong> or <strong>teacher name</strong></legend>
+    <legend> Search using 
+    <input type="checkbox" id="${classCheckboxId} checked"></input>
+    <strong>Class name </strong> or
+    <input type="checkbox" id="${teacherCheckboxId}" checked></input>
+    <strong>Teacher name</strong></legend>
     <legend>/ to focus, Tab + Enter for first result</legend>
-    <input id="${inputbarId}" type="search" autofocus>
+    <input id="${inputBarId}" type="search" autofocus>
     <button type="submit" disabled style="display: none" aria-hidden="true"></button>
     </form>
 </div>
@@ -45,12 +51,12 @@ function injectSearch() {
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
         //see if already have search
-        if (roomList.parentElement.querySelector("." + searchappClass) !== null) {
+        if (roomList.parentElement.querySelector("." + searchAppClass) !== null) {
             return
         }
         
         roomList.insertAdjacentHTML("beforebegin", html)  
-        let searchBar = roomList.parentElement.querySelector("#" + inputbarId)
+        let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
