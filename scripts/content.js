@@ -55,16 +55,15 @@ function injectSearch() {
             return
         }
         
-        roomList.insertAdjacentHTML("beforebegin", html)  
+        roomList.insertAdjacentHTML("beforebegin", html)
         let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
 
         document.addEventListener("keyup", (event) => {
+            let cwizElement = getParentByTag(roomList, "c-wiz")
             if (event.key == "/") {
                 //This checks whether home page is hidden. When creating a new class as teacher,
                 //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
                 //pressing / in creation popup will focus the darkened searchbar.
-                let cwizElement = getParentByTag(roomList, "c-wiz")
-
                 if (cwizElement?.getAttribute("aria-hidden") === "true") {
                     return //Do not focus searchbar
                 }
@@ -72,9 +71,16 @@ function injectSearch() {
             }
 
             //Match rooms with input
+            let checkedRoomName = cwizElement.querySelector("#" + classCheckboxId).checked //bool
+            let checkedTeacherName = cwizElement.querySelector("#" + teacherCheckboxId).checked //bool
+            let matchOptions = {
+                matchRoomName: checkedRoomName,
+                matchTeacher: checkedTeacherName
+            }
+
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-            roomNodes.forEach((element) => matchRoom(element, input))
+            roomNodes.forEach((element) => matchRoom(element, input, matchOptions))
         })
     })  
 }
@@ -84,10 +90,14 @@ function injectSearch() {
  * 
  * @param {HTMLLIElement} roomNode 
  * @param {string} input
+ * @param {object} options
+ * 
+ * @param {boolean} options.matchRoomName
+ * @param {boolean} options.matchTeacher
  * 
  */
 
-function matchRoom(roomNode, input) {
+function matchRoom(roomNode, input, options={}) {
     let roomNameNode = roomNode.querySelector(roomNameSelector)
     let roomTeacherNode = roomNode.querySelector(roomTeacherSelector)
     let roomTeacher = ""
@@ -101,11 +111,16 @@ function matchRoom(roomNode, input) {
         roomName = roomNameNode.textContent.toLowerCase()
     }
 
-    let page = getParentByTag(roomNode, "c-wiz")
-    let matchRoom = page.querySelector("#" + classCheckboxId).checked
-    let matchTeacher = page.querySelector("#" + teacherCheckboxId).checked
+    //If options are not set, value will be undefined
+    if ((typeof options.matchRoomName) !== "boolean") {
+        options.matchRoomName = true
+    }
 
-    if ((roomName.includes(input) && matchRoom) || (roomTeacher.includes(input) && matchTeacher)) {
+    if ((typeof options.matchTeacher) !== "boolean") {
+        options.matchTeacher = true
+    }
+
+    if ((roomName.includes(input) && options.matchRoomName) || (roomTeacher.includes(input) && options.matchTeacher)) {
         roomNode.style.display = 'flex'       
     } else {
         roomNode.style.display = 'none'
