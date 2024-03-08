@@ -100,28 +100,17 @@ function injectSearch() {
 function matchRoom(roomNode, input, options={}) {
     let roomNameNode = roomNode.querySelector(roomNameSelector)
     let roomTeacherNode = roomNode.querySelector(roomTeacherSelector)
-    let roomTeacher = ""
-    let roomName = ""
 
-    //roomTeacher does not exist when using as teacher
-    if (roomTeacherNode) {
-        roomTeacher = roomTeacherNode.textContent.toLowerCase()
-    }
-    if (roomNameNode) {
-        roomName = roomNameNode.textContent.toLowerCase()
-    }
+    //roomTeacher does not exist when using as teacher, default is empty srting
+    let roomTeacher = roomTeacherNode?.textContent?.toLowerCase() ?? ""
+    let roomName = roomNameNode?.textContent?.toLowerCase() ?? ""
 
-    //If options are not set, value will be undefined
-    if ((typeof options.matchRoomName) !== "boolean") {
-        options.matchRoomName = true
-    }
-
-    if ((typeof options.matchTeacher) !== "boolean") {
-        options.matchTeacher = true
-    }
+    //If options are not set, will default to true
+    options.matchRoomName = options.matchRoomName ?? true;
+    options.matchTeacher = options.matchTeacher ?? true;
 
     if ((roomName.includes(input) && options.matchRoomName) || (roomTeacher.includes(input) && options.matchTeacher)) {
-        roomNode.style.display = 'flex'       
+        roomNode.style.display = 'flex' 
     } else {
         roomNode.style.display = 'none'
     }
