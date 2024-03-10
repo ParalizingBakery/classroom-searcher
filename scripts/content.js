@@ -57,9 +57,9 @@ function injectSearch() {
         
         roomList.insertAdjacentHTML("beforebegin", html)
         let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
+        let cwizElement = getParentByTag(roomList, "c-wiz")
 
         document.addEventListener("keyup", (event) => {
-            let cwizElement = getParentByTag(roomList, "c-wiz")
             if (event.key == "/") {
                 //This checks whether home page is hidden. When creating a new class as teacher,
                 //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
@@ -70,19 +70,22 @@ function injectSearch() {
                 searchBar.focus()
             }
 
-            //Match rooms with input
-            let checkedRoomName = cwizElement.querySelector("#" + classCheckboxId).checked //bool
-            let checkedTeacherName = cwizElement.querySelector("#" + teacherCheckboxId).checked //bool
-            let matchOptions = {
-                matchRoomName: checkedRoomName,
-                matchTeacher: checkedTeacherName
-            }
-
+            let matchOptions = readCheckboxOptions(cwizElement)
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
             roomNodes.forEach((element) => matchRoom(element, input, matchOptions))
         })
     })  
+}
+
+function readCheckboxOptions (cwizElement) {
+    let checkedRoomName = cwizElement.querySelector("#" + classCheckboxId)?.checked ?? true 
+    let checkedTeacherName = cwizElement.querySelector("#" + teacherCheckboxId)?.checked ?? true
+    let options = {
+        matchRoomName: checkedRoomName,
+        matchTeacher: checkedTeacherName
+    }
+    return options
 }
 
 /**
