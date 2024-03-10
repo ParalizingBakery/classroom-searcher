@@ -5,3 +5,12 @@ body {
 h1 {
     color: forestgreen;
 }
+
+.checkbox-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.checkbox {
+    margin-right: 0.5rem;
+}
