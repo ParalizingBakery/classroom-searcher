@@ -78,6 +78,13 @@ function initHostButton () {
     button.addEventListener("click", () => {
         if (haveRequired) {return}
         browser.permissions.request(required)
+            .then((approved) => {
+                if (approved) {
+                    button.innerHTML = "Request Successful"
+                } else {
+                    button.innerHTML = "Request Failed"
+                }
+            })
     })
 }
 
