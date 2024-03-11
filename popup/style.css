@@ -8,9 +8,9 @@ h1 {
 
 .checkbox-container {
     display: flex;
-    justify-content: space-between;
 }
 
-.checkbox {
+.checkbox-container > input {
     margin-right: 0.5rem;
+    margin-left: 0.5rem;
 }
