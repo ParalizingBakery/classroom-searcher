@@ -1,5 +1,55 @@
+const checkboxContainerClass = "checkbox-container"
+
 function main() {
     initHostButton()
+    initCheckboxes()
+}
+
+function initCheckboxes() {
+    //Match id with perm to request
+    const permList = {
+        "request-storage-checkbox": {
+            permissions: ["storage"]
+        }
+    }
+    //Select all checkboxes
+    let checkboxNodes = document.querySelectorAll(`.${checkboxContainerClass} > input`)
+
+    checkboxNodes.forEach( async (element) => {
+        const perm = permList[element.id]
+        let havePerm = await browser.permissions.contains(perm)
+        
+        //Check if contains permission
+        if (havePerm) {
+            element.checked = true
+        }
+        //Add event listeners
+        element.addEventListener("change", (event) => handlePermCheckbox(event, perm))
+    })
+}
+/**
+ * 
+ * @param {Event} event 
+ * @param {browser.permissions.Permissions} permission 
+ */
+function handlePermCheckbox (event, permission) {
+    /** @type {HTMLInputElement} */
+    let checkbox = event.target
+
+    if (checkbox.checked) {
+        browser.permissions.request(permission)
+            .then((approved) => {
+                let status = ""
+                if (approved) {
+                    status = "Request Successful"
+                } else {
+                    status = "Request Failed"
+                }
+                checkbox.labels.forEach((label) => {
+                    label.innerText = label.innerText + ` : ${status}`
+                })
+            })
+    }
 }
 
 function initHostButton () {
