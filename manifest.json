@@ -10,12 +10,13 @@
       "default_popup": "popup/index.html"
     },
     "background": {
-        "scripts" : ["background.js"],
+        "scripts" : ["browser-polyfill.js", "background.js"],
         "service_worker" : "service_worker.js"
     },
     "content_scripts": [
         {
             "js": [
+                "/browser-polyfill.js",
                 "/scripts/content.js"
             ],
             "matches": [
