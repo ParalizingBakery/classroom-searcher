@@ -36,6 +36,11 @@ const html = `
     </form>
 </div>
 `
+/**
+ * @typedef {Object} matchOptions
+ * @property {boolean} matchRoomName
+ * @property {boolean} matchTeacher
+ */
 
 function main(){
     //the parameter for callback is iterable, if you want to do smth for each mutaition please use for .. of ..
@@ -58,6 +63,7 @@ function injectSearch() {
         roomList.insertAdjacentHTML("beforebegin", html)
         let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
         let cwizElement = getParentByTag(roomList, "c-wiz")
+        let userOptions = new UserOptions(cwizElement)
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
@@ -70,22 +76,71 @@ function injectSearch() {
                 searchBar.focus()
             }
 
-            let matchOptions = readCheckboxOptions(cwizElement)
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-            roomNodes.forEach((element) => matchRoom(element, input, matchOptions))
+            roomNodes.forEach((element) => matchRoom(element, input, userOptions.read()))
         })
     })  
 }
 
-function readCheckboxOptions (cwizElement) {
-    let checkedRoomName = cwizElement.querySelector("#" + classCheckboxId)?.checked ?? true 
-    let checkedTeacherName = cwizElement.querySelector("#" + teacherCheckboxId)?.checked ?? true
-    let options = {
-        matchRoomName: checkedRoomName,
-        matchTeacher: checkedTeacherName
+class UserOptions {
+    constructor(cwizElement) {
+        if (!(cwizElement instanceof HTMLElement) || (cwizElement.tagName.toLowerCase() !== "c-wiz")) {
+            throw new Error("CheckboxOptions: constructor argument not c-wiz element")
+        }
+
+        this.cwiz = cwizElement
+        this.checkboxClassName = cwizElement.querySelector(`#${classCheckboxId}`)
+        this.checkboxTeacherName = cwizElement.querySelector(`#${teacherCheckboxId}`)
+
+        if (!(this.checkboxClassName instanceof HTMLInputElement) || !(this.checkboxTeacherName instanceof HTMLInputElement)) {
+            throw new Error("CheckboxOptions: checkbox input elements not found")
+        }
+
+        this.init()
     }
-    return options
+
+    async init() {
+        //Read storage
+        let storedSettings = await browser.storage.local.get({
+            matchRoomName: true,
+            matchTeacher: true
+        })
+
+        //Set checkbox to storage value
+        this.checkboxClassName.checked = storedSettings.matchRoomName
+        this.checkboxTeacherName.checked = storedSettings.matchTeacher
+
+        //Set event listeners to write changes
+        async function handleCheckboxChange (checkbox) {
+            if (!(checkbox instanceof Element) || (checkbox.tagName.toLowerCase() !== "input") || (checkbox.getAttribute("type") !== "checkbox")) {
+                throw new Error("handleCheckboxChange() : argument not input element with type checkbox")
+            }
+            
+            const idToKey = {
+                [classCheckboxId]: "matchRoomName",
+                [teacherCheckboxId]: "matchTeacher"
+            }
+
+            browser.storage.local.set({
+                [idToKey[checkbox.id]]: checkbox.checked
+            }).catch((reason) => {throw new Error(`handleCheckboxChange : storageArea.set failed ${reason}`)} )
+        }
+
+        this.checkboxClassName.addEventListener("change", () => handleCheckboxChange(this.checkboxClassName))
+        this.checkboxTeacherName.addEventListener("change", () => handleCheckboxChange(this.checkboxTeacherName))
+    }
+
+    /**
+     * Reads the option checkboxes and returns object containing boolean read value.
+     * @returns {matchOptions}
+     */
+    read() {
+        return {
+            matchRoomName: this.checkboxClassName?.checked ?? true,
+            matchTeacher: this.checkboxTeacherName?.checked ?? true
+        }
+    }
 }
 
 /**
@@ -93,7 +148,7 @@ function readCheckboxOptions (cwizElement) {
  * 
  * @param {HTMLLIElement} roomNode 
  * @param {string} input
- * @param {object} options
+ * @param {matchOptions} options
  * 
  * @param {boolean} options.matchRoomName
  * @param {boolean} options.matchTeacher
