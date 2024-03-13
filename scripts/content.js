@@ -1,8 +1,3 @@
-//Polyfill browser for chrome. MV3 chrome supports promises
-if(typeof browser == "undefined") {
-    globalThis.browser = chrome
-}
-
 //May change when Google Classroom updates UI
 const roomListSelector = ".JwPp0e"
 const roomNodeSelector = "li.gHz6xd.Aopndd.rZXyy"
