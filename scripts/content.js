@@ -62,7 +62,7 @@ function injectSearch() {
         
         roomList.insertAdjacentHTML("beforebegin", html)
         let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
-        let cwizElement = getParentByTag(roomList, "c-wiz")
+        let cwizElement = roomList.closest("c-wiz")
         let userOptions = new UserOptions(cwizElement)
 
         document.addEventListener("keyup", (event) => {
@@ -172,28 +172,6 @@ function matchRoom(roomNode, input, options={}) {
     } else {
         roomNode.style.display = 'none'
     }
-}
-
-/**
- * Given an element, the function will loop through the element's parents 
- * until it finds the first parent element with the provided tag.
- * 
- * This function checks the tag of the starting element.
- * 
- * This function converts the parent element's tag name to lowercase.
- * 
- * @param {HTMLElement} firstElement - Element to start the loop from
- * @param {string} tag - Tag of the desired parent element in lowercase
- * 
- * @returns {HTMLElement|null} 
- */
-function getParentByTag(firstElement, tag) {
-    for (let element = firstElement; element !== null; element = element.parentElement) {
-        if (element.tagName.toLowerCase() === tag) {
-            return element
-        }
-    }
-    return null
 }
 
 main()
