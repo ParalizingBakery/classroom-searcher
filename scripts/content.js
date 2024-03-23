@@ -10,6 +10,9 @@ const inputBarId = "searchbar"
 const classCheckboxId = "classCheckbox"
 const teacherCheckboxId = "teacherCheckbox"
 
+//Storage keys
+const storageAliasKey = "class_aliases"
+
 //if class or id of element is changed, also change selector in injectsearch()
 //disabled button in form to prevent submitting form when pressing enter
 const html = `
@@ -40,6 +43,12 @@ const html = `
  * @typedef {Object} matchOptions
  * @property {boolean} matchRoomName
  * @property {boolean} matchTeacher
+ */
+
+/**
+ * @typedef {object} classAlias
+ * @property {string | null} className
+ * @property {string | null} teacherName
  */
 
 function main(){
@@ -140,6 +149,71 @@ class UserOptions {
             matchRoomName: this.checkboxClassName?.checked ?? true,
             matchTeacher: this.checkboxTeacherName?.checked ?? true
         }
+    }
+}
+
+class AliasInject {
+    constructor (cwizElement) {
+        if (!(cwizElement instanceof HTMLElement) || (cwizElement.tagName.toLowerCase() !== "c-wiz")) {
+            throw new Error(`initAliases : argument not c-wiz element`)
+        }
+
+        this.cwizElement = cwizElement
+        browser.storage.local.get({[storageAliasKey]: {}})
+            .then((result) => {
+                /** @type {Object.<string, classAlias>}*/
+                this.aliases = result[storageAliasKey]
+            })
+            .catch((rejection) => {
+                throw new Error(`initAliases : storage.local.get(${storageAliasKey} failed) ${rejection}`)
+            })
+    }
+    
+    /**
+     * - Edits the classNodes in the c-wiz of AliasInject to the aliases in this.aliases.
+     * - Does not update this.aliases to match the storage before editing
+     */
+    inject() {
+        for (const classId in this.aliases) {
+            // Get the associated <a> by querySelector with href attribute
+            // There are many <a> that have the same href, so we will use one that is least nested
+            let roomAnchor = this.cwizElement.querySelector(`${roomNodeSelector} > div > div > a[href~=${classId}]`)
+            if (!roomAnchor) {
+                console.error(`AliasInject.inject() : roomAnchor of stored classId ${classId} not found}`, this)
+                continue
+            }
+
+            // Get roomNode which is parent
+            let roomNode = roomAnchor.closest(roomNodeSelector)
+            if (!roomNode) {
+                console.error(`AliasInject.inject() : Ancestor of roomAnchor with selector ${roomNodeSelector} not found`)
+                continue
+            }
+
+            // This is where the class name is stored
+            let roomNameDiv = roomNode.querySelector(roomNameSelector)
+
+            // Use textContent because roomNode may be hidden. innerText returns only what the user sees
+            roomNameDiv.textContent = this.aliases[classId].className ?? roomNameDiv.textContent
+        }
+    }
+
+    write(classId, newAlias) {
+        if ((typeof classId !== "string") || (typeof newAlias !== "string")) {
+            return
+        }
+
+        /** @type {classAlias}} */
+        let storeValue = {
+            className: newAlias,
+            teacherName: null
+        }
+
+        browser.storage.local.set({
+            [classId]: storeValue
+        }).catch((reason) => {
+            console.error(`AliasInject.write : setting key ${classId} as ${JSON.stringify(storeValue)} because ${reason}`)
+        })
     }
 }
 
