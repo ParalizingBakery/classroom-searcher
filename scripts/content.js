@@ -1,11 +1,13 @@
 //May change when Google Classroom updates UI
 const roomListSelector = ".JwPp0e"
-const roomNodeSelector = "li.gHz6xd.Aopndd.rZXyy"
+const roomNodeSelector = "li.gHz6xd.Aopndd"
+const roomNodeHeaderSelector = "div.Tc9hUd"
 const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
 const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
 
 //Classes and Id for elements in html that is queried in code
 const searchAppClass = "searchapp"
+const AliasButtonId = "alias-button"
 const inputBarId = "searchbar"
 const classCheckboxId = "classCheckbox"
 const teacherCheckboxId = "teacherCheckbox"
@@ -19,24 +21,112 @@ const html = `
 <div class="${searchAppClass}">
     <style>
     .${searchAppClass} {
+        display: flex;
+        justify-content: space-between;
         margin-left: 1.5rem;
+        margin-right: 1.5rem;
         margin-top: 1.5rem;
+        line-height: normal;
     }
 
     legend {
         font-size: 1rem;
     }
+
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+    
+    .modal-content {
+        overflow: auto; /* Enable scroll if needed */;
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        border: 1px solid #888;
+        width: min(80%, 500px);
+    }
+    
+    .modal-content-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 1.5rem;
+        color: white;
+        background-color: #336600; /* Dark Green*/
+        padding: 16px 20px;
+    }
+
+    .modal-content-header button {
+        font-size: 1rem;
+    }
+    
+    .modal-content-body {
+        padding: 20px;
+    }
+
+    .modal-content-body input[type=text] {
+        display: block;
+        width: min(100%, 300px);
+    }
+
+    .modal-content-body ul {
+        list-style: circle;
+        padding-left: 15px;
+    }
+
+    .mb-1 {
+        margin-bottom: 1em;
+    }
+
     </style>
-    <form>
-    <legend> Search using 
-    <input type="checkbox" id="${classCheckboxId}" checked></input>
-    <strong>Class name </strong> or
-    <input type="checkbox" id="${teacherCheckboxId}" checked></input>
-    <strong>Teacher name</strong></legend>
-    <legend>/ to focus, Tab + Enter for first result</legend>
-    <input id="${inputBarId}" type="search" autofocus>
-    <button type="submit" disabled style="display: none" aria-hidden="true"></button>
-    </form>
+    <div class="modal" id="alias-modal">
+        <div class="modal-content">
+            <div class="modal-content-header">
+                <p>Rename Class Aliases<p>
+                <button id="modal-return">Return</button>
+            </div>
+            <div class="modal-content-body">
+                <p class="mb-1">
+                    Rename classes for yourself. Affects search
+                </p>
+                <div class="mb-1">
+                    <label for"alias-search-class">
+                        Enter the room you want to rename: 
+                    </label>
+                    <input type="text" id="alias-class-search">
+                </div>
+                <ul class="alias-class-results mb-1">
+                    <li><a href="https://google.com" target="_blank">A1 CEFR English Classroom</a> - John Doe asdfasdf sadf asdf asdf asdf asdfasdfasdf asdf asdf <button>Select</button></li>
+                    <li>A1 CEFR English Classroom - John Doe <button>Select</button></li>
+                    <li>A1 CEFR English Classroom - John Doe <button>Select</button></li>
+                </ul>
+                <div class="mb-1">
+                    <p>Rename (Selected Class) to</p>
+                    <input type="text" id="alias-class-rename">
+                    <button id="alias-save-button">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <legend> Search using 
+        <input type="checkbox" id="${classCheckboxId}" checked></input>
+        <strong>Class name </strong> or
+        <input type="checkbox" id="${teacherCheckboxId}" checked></input>
+        <strong>Teacher name</strong></legend>
+        <legend>/ to focus, Tab + Enter for first result</legend>
+        <input id="${inputBarId}" type="search" autofocus>
+        <button type="submit" disabled style="display: none" aria-hidden="true"></button>
+    </div>
+    <div>
+        <button id="alias-button">Rename Class Aliases</button>
+    </div>
 </div>
 `
 /**
@@ -48,7 +138,7 @@ const html = `
 /**
  * @typedef {object} classAlias
  * @property {string | null} className
- * @property {string | null} teacherName
+ * @property {string} originalName
  */
 
 function main(){
@@ -65,14 +155,28 @@ function injectSearch() {
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
         //see if already have search
-        if (roomList.parentElement.querySelector("." + searchAppClass) !== null) {
+        if (roomList.parentElement.querySelector("." + searchAppClass)) {
             return
         }
         
         roomList.insertAdjacentHTML("beforebegin", html)
+
         let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
         let cwizElement = roomList.closest("c-wiz")
         let userOptions = new UserOptions(cwizElement)
+        let classAlias = new AliasInject(cwizElement)
+
+        classAlias.getStoredAliases().then((aliases) => {
+            //Initialzes the modal
+            classAlias.initHTML()
+
+            //Rename classes when roomList changes
+            const AliasInjector = new MutationObserver(()=>{classAlias.injectAliases()})
+            AliasInjector.observe(classAlias.cwizElement.querySelector(roomListSelector), {childList: true})
+        
+        }).catch((reason) => {
+            console.error(reason)
+        })
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
@@ -87,7 +191,13 @@ function injectSearch() {
 
             let input = searchBar.value.toLowerCase()
             let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-            roomNodes.forEach((element) => matchRoom(element, input, userOptions.read()))
+            roomNodes.forEach((element) => {
+                if (matchRoom(element, input, userOptions.read())) {
+                    element.style.display = 'flex'
+                } else {
+                    element.style.display = 'none'
+                }
+            })
         })
     })  
 }
@@ -159,25 +269,150 @@ class AliasInject {
         }
 
         this.cwizElement = cwizElement
-        browser.storage.local.get({[storageAliasKey]: {}})
+        this.renamer = {
+            selectedRoom: {
+                id: null,
+                originalName: null
+            }
+        }
+        /** @type {Object.<string, classAlias>}*/
+        this.aliases = {}
+    }
+
+    /**
+     * Gets aliases from storage and sets AliasInject.aliases to the result
+     * 
+     * Also returns the updated AliasInject.aliases
+     * @returns {Promise<object.<string, classAlias>>}
+     */
+    getStoredAliases() {
+        return new Promise((resolve, reject) => {
+            browser.storage.local.get({[storageAliasKey]: {}})
             .then((result) => {
                 /** @type {Object.<string, classAlias>}*/
                 this.aliases = result[storageAliasKey]
+                resolve(this.aliases)
             })
             .catch((rejection) => {
-                throw new Error(`initAliases : storage.local.get(${storageAliasKey} failed) ${rejection}`)
+                reject(new Error(`initAliases : storage.local.get(${storageAliasKey} failed) ${rejection}`))
             })
+        })
     }
-    
+
+    initHTML() {
+        const MAX_ROOM_SEARCH_LI = 3
+
+        /** @type {HTMLDivElement} */
+        let modal = this.cwizElement.querySelector("div#alias-modal")
+
+        /** @type {HTMLInputElement} */
+        let searchInput = this.cwizElement.querySelector("input#alias-class-search")
+
+        /** @type {HTMLInputElement}*/
+        let renameInput = this.cwizElement.querySelector("input#alias-class-rename")
+
+        /** @type {HTMLButtonElement} */
+        let saveButton = this.cwizElement.querySelector("button#alias-save-button")
+
+        //Modal Enable 
+        this.cwizElement.querySelector("#alias-button").addEventListener('click', () => {
+            modal.style.display = "block"
+        })
+
+        //Modal Disable
+        this.cwizElement.querySelector("#modal-return").addEventListener('click', () => {
+            modal.style.display = "none"
+        })
+
+        //Room Search Input Listener
+        searchInput.addEventListener('keyup', (event) => {
+            let roomNodeAll = this.cwizElement.querySelectorAll(roomNodeSelector)
+            let ulResults = this.cwizElement.querySelector("ul.alias-class-results")
+
+            //Empties the results list
+            ulResults.replaceChildren()
+
+            //Remove memory
+            this.renamer.selectedRoom.id = null
+
+            //Populate the list
+            for (let i = 0, matches = 0; matches < MAX_ROOM_SEARCH_LI && i < roomNodeAll.length; i++) {
+                let roomNode = roomNodeAll[i]
+
+                //Doesn't match search
+                if (!matchRoom(roomNode, searchInput.value, {matchTeacher: false})) {
+                    continue
+                }
+
+                //Information
+                let roomName = roomNode.querySelector(roomNameSelector)?.textContent ?? "Room Name Error"
+                let roomTeacher = roomNode.querySelector(roomTeacherSelector)?.textContent ?? "Room Teacher Error"
+                let roomAnchor = roomNode.querySelector(`${roomNodeHeaderSelector} > div > a`)
+                let roomUrl = roomAnchor.getAttribute("href")
+                let pathLevels = roomUrl.split("/") //example url /u/2/c/Nr35MrMxODEwrTc0
+                let roomId = pathLevels[pathLevels.length - 1] //room id is hopefully at the end
+                
+                //DOM inits
+                let li = ulResults.appendChild(document.createElement("li"))
+                let a = li.appendChild(document.createElement("a"))
+                let text = li.appendChild(document.createTextNode(` - ${roomTeacher} `))
+                let button = li.appendChild(document.createElement("button"))
+                
+                //Anchor show room name with class url href
+                a.appendChild(document.createTextNode(roomName))
+                a.setAttribute("href", roomUrl)
+                a.setAttribute("target", "_blank") // Open link in new tab
+
+                //li button setup
+                button.appendChild(document.createTextNode("Select"))
+
+                // On select <li>
+                button.addEventListener("click", (event) => {
+                    // Make other <li> a circle (unselect)
+                    ulResults.querySelectorAll("li").forEach((childList) => {
+                        childList.style.listStyle = "circle"
+                    })
+                    li.style.listStyle = "disc"
+
+                    //Save roomId and orginal Name
+                    this.renamer.selectedRoom.id = roomId
+                })
+
+                //Alias results append successful
+                matches++
+            }
+        })
+
+        //Alias Save Button
+        saveButton.addEventListener("click", (event) => {
+            //Write alias in storage
+            if (typeof this.renamer.selectedRoom.id !== "string") {
+                saveButton.textContent = "Room Not Selected"
+                return
+            }
+
+            this.write(this.renamer.selectedRoom.id, renameInput.value)
+            .then((status) => {
+                //Reinject Aliases
+                this.injectAliases()
+
+                //Success Message
+                saveButton.textContent = `Renamed ${this.renamer.selectedRoom.id} to ${renameInput.value}`
+            }).catch((error) => {
+                console.error(error)
+            })
+        })
+    }
+
     /**
      * - Edits the classNodes in the c-wiz of AliasInject to the aliases in this.aliases.
      * - Does not update this.aliases to match the storage before editing
      */
-    inject() {
+    injectAliases() {
         for (const classId in this.aliases) {
             // Get the associated <a> by querySelector with href attribute
             // There are many <a> that have the same href, so we will use one that is least nested
-            let roomAnchor = this.cwizElement.querySelector(`${roomNodeSelector} > div > div > a[href~=${classId}]`)
+            let roomAnchor = this.cwizElement.querySelector(`${roomNodeHeaderSelector} > div > a[href*=${classId}]`)
             if (!roomAnchor) {
                 console.error(`AliasInject.inject() : roomAnchor of stored classId ${classId} not found}`, this)
                 continue
@@ -193,36 +428,56 @@ class AliasInject {
             // This is where the class name is stored
             let roomNameDiv = roomNode.querySelector(roomNameSelector)
 
-            // Use textContent because roomNode may be hidden. innerText returns only what the user sees
-            roomNameDiv.textContent = this.aliases[classId].className ?? roomNameDiv.textContent
+            // Use textContent because roomNode may be hidden. innerText returns only what the user seesx   
+            roomNameDiv.textContent = this.aliases[classId].className ?? this.aliases[classId].originalName
         }
     }
 
+    /**
+     * Updates this.aliases and writes it to storage.
+     * 
+     * Use blank strings in newAlias to indicate resetting the name
+     * 
+     * @param {string} classId 
+     * @param {string} newAlias 
+     * @returns {Promise<boolean>}
+     */
     write(classId, newAlias) {
-        if ((typeof classId !== "string") || (typeof newAlias !== "string")) {
-            return
-        }
+        return new Promise((resolve, reject) => {
+            if ((typeof classId !== "string") || (typeof newAlias !== "string")) {
+                return
+            }
 
-        /** @type {classAlias}} */
-        let storeValue = {
-            className: newAlias,
-            teacherName: null
-        }
-
-        browser.storage.local.set({
-            [classId]: storeValue
-        }).catch((reason) => {
-            console.error(`AliasInject.write : setting key ${classId} as ${JSON.stringify(storeValue)} because ${reason}`)
+            /** @type {classAlias}} */
+            let storeValue = {
+                className: newAlias ? newAlias : null, //Blank strings are falsy
+                originalName: this.renamer.selectedRoom.originalName
+            }
+    
+            this.aliases[classId] = storeValue
+            
+            //Update alias in storage
+            //This fufills with nothing when successful
+            browser.storage.local.set({
+                [storageAliasKey]: this.aliases
+            }).then(() => {
+                resolve(true)
+            })
+            .catch((reason) => {
+                reject(new Error(`AliasInject.write : setting key ${storageAliasKey} as ${JSON.stringify(storeValue)} because ${reason}`))
+            })
         })
     }
 }
 
 /**
- * Matches a string input with the room name and teacher name of a Google Classroom li element that contains each room.
+ * Matches a string input with the room name and/or teacher name of a Google Classroom li element that contains each room.
  * 
  * @param {HTMLLIElement} roomNode 
  * @param {string} input
  * @param {matchOptions} options
+ * 
+ * @returns {boolean}
  * 
  * @param {boolean} options.matchRoomName
  * @param {boolean} options.matchTeacher
@@ -242,9 +497,9 @@ function matchRoom(roomNode, input, options={}) {
     options.matchTeacher = options.matchTeacher ?? true;
 
     if ((roomName.includes(input) && options.matchRoomName) || (roomTeacher.includes(input) && options.matchTeacher)) {
-        roomNode.style.display = 'flex' 
+        return true
     } else {
-        roomNode.style.display = 'none'
+        return false
     }
 }
 
