@@ -170,6 +170,9 @@ function injectSearch() {
             //Initialzes the modal
             classAlias.initHTML()
 
+            //Get original room names in this.aliases before injection
+            classAlias.setOriginalNames()
+
             //Rename classes when roomList changes
             const AliasInjector = new MutationObserver(()=>{classAlias.injectAliases()})
             AliasInjector.observe(classAlias.cwizElement.querySelector(roomListSelector), {childList: true})
@@ -374,8 +377,15 @@ class AliasInject {
                     })
                     li.style.listStyle = "disc"
 
-                    //Save roomId and orginal Name
+                    //Save roomId and originalName
                     this.renamer.selectedRoom.id = roomId
+
+                    //If this room has never been alias'd before, get original name
+                    if (!this.aliases[roomId]) {
+                        this.renamer.selectedRoom.originalName = this.setOriginalNames([roomId])[0]
+                    } else {
+                        this.renamer.selectedRoom.originalName = this.aliases[roomId].originalName
+                    }
                 })
 
                 //Alias results append successful
@@ -450,7 +460,8 @@ class AliasInject {
 
             /** @type {classAlias}} */
             let storeValue = {
-                className: newAlias ? newAlias : null, //Blank strings are falsy
+                //Blank strings are falsy
+                className: newAlias ? newAlias : null,
                 originalName: this.renamer.selectedRoom.originalName
             }
     
@@ -466,6 +477,39 @@ class AliasInject {
             .catch((reason) => {
                 reject(new Error(`AliasInject.write : setting key ${storageAliasKey} as ${JSON.stringify(storeValue)} because ${reason}`))
             })
+        })
+    }
+
+    /**
+     * - Returns an array of the name that is present in roomNameNode for each id
+     *   in updateArray (default this.aliases keys)
+     * 
+     * - Updates this.aliases[classId].originalName if it exists.
+     * 
+     * ! Call this when there are no changes to the room name at all (before injectAliases)
+     * 
+     * @param {string[]} updateArray array of id to update
+     * 
+     * @returns {string[] | null[]} Array of the original names, null at each index where element not found
+     */
+    setOriginalNames(updateArray = Object.keys(this.aliases)) {
+        return updateArray.map((classId, index, array) => {
+            let roomNode = getRoomNodeFromId(this.cwizElement, classId)
+            if (!roomNode) {
+                console.error(`AliasInject.setOriginalNames() : roomNode not found from id ${classId}`)
+                return null
+            }
+            
+            let roomName = roomNode.querySelector(roomNameSelector)?.textContent
+            if (!roomName) {
+                console.error(`AliasInject.setOriginalNames() : roomName not found from roomNode with id ${classId}`)
+                return null
+            }
+
+            if (this.aliases[classId]) {
+                this.aliases[classId].originalName = roomName
+            }
+            return roomName
         })
     }
 }
@@ -501,6 +545,37 @@ function matchRoom(roomNode, input, options={}) {
     } else {
         return false
     }
+}
+
+/**
+ * Given a scope and id of a roomNode, returns the roomNode that contains the id
+ * in its (header) anchor element's href.
+ * 
+ * @param {HTMLElement} scope 
+ * @param {string} id 
+ * 
+ * @returns {HTMLElement | null}
+ */
+function getRoomNodeFromId(scope, id) {
+    // Ensure scope is an instance of HTMLElement and id is a string
+    if (!(scope instanceof HTMLElement)) {
+        throw new Error(`getRoomNodeFromId : scope is not instance of HTMLElement`)
+    }
+
+    if (!(typeof id === "string")) {
+        throw new Error(`getRoomNodeFromId : id is not typeof string`)
+    }
+
+    let roomAnchor = scope.querySelector(`${roomNodeHeaderSelector} > div > a[href*=${id}]`)
+
+    // Anchor not found
+    if (!roomAnchor) {
+        return null
+    }
+
+    // Get roomNode which is the ancestor of the anchor
+    // closest() returns null when not found
+    return roomAnchor.closest(roomNodeSelector)
 }
 
 main()
