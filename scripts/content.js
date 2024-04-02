@@ -170,11 +170,15 @@ function injectSearch() {
             //Initialzes the modal
             classAlias.initHTML()
 
-            //Get original room names in this.aliases before injection
-            classAlias.setOriginalNames()
-
-            //Rename classes when roomList changes
-            const AliasInjector = new MutationObserver(()=>{classAlias.injectAliases()})
+            
+            const AliasInjector = new MutationObserver(()=>{
+                //Get original room names in this.aliases
+                try {
+                    classAlias.setOriginalNames()
+                } catch {}
+                //Rename classes when roomList changes
+                classAlias.injectAliases()
+            })
             AliasInjector.observe(classAlias.cwizElement.querySelector(roomListSelector), {childList: true})
         
         }).catch((reason) => {
@@ -273,6 +277,7 @@ class AliasInject {
 
         this.cwizElement = cwizElement
         this.renamer = {
+            hasInjectedAlias: false,
             selectedRoom: {
                 id: null,
                 originalName: null
@@ -419,6 +424,9 @@ class AliasInject {
      * - Does not update this.aliases to match the storage before editing
      */
     injectAliases() {
+        // setOrigianlNames() for all aliases is no longer safe to call
+        this.renamer.hasInjectedAlias = true
+
         for (const classId in this.aliases) {
             // Get the associated <a> by querySelector with href attribute
             // There are many <a> that have the same href, so we will use one that is least nested
@@ -493,6 +501,11 @@ class AliasInject {
      * @returns {string[] | null[]} Array of the original names, null at each index where element not found
      */
     setOriginalNames(updateArray = Object.keys(this.aliases)) {
+        // If attempting all aliases, aliasInject must not have ran
+        if (updateArray === Object.keys(this.aliases)) {
+            throw new Error(`AliasInject.setOriginalNames() : attempted to get all original names when injectAlias already ran`)
+        }
+
         return updateArray.map((classId, index, array) => {
             let roomNode = getRoomNodeFromId(this.cwizElement, classId)
             if (!roomNode) {
