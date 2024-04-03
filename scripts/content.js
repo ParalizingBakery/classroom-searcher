@@ -85,6 +85,19 @@ const html = `
     }
 
     </style>
+    <div>
+        <legend> Search using 
+        <input type="checkbox" id="${classCheckboxId}" checked autocomplete="off"></input>
+        <strong>Class name </strong> or
+        <input type="checkbox" id="${teacherCheckboxId}" checked autocomplete="off"></input>
+        <strong>Teacher name</strong></legend>
+        <legend>/ to focus, Tab + Enter for first result</legend>
+        <input id="${inputBarId}" type="search" autofocus>
+        <button type="submit" disabled style="display: none" aria-hidden="true"></button>
+    </div>
+    <div>
+        <button id="alias-button">Rename Class Aliases</button>
+    </div>
     <div class="modal" id="alias-modal">
         <div class="modal-content">
             <div class="modal-content-header">
@@ -110,19 +123,6 @@ const html = `
                 </div>
             </div>
         </div>
-    </div>
-    <div>
-        <legend> Search using 
-        <input type="checkbox" id="${classCheckboxId}" checked></input>
-        <strong>Class name </strong> or
-        <input type="checkbox" id="${teacherCheckboxId}" checked></input>
-        <strong>Teacher name</strong></legend>
-        <legend>/ to focus, Tab + Enter for first result</legend>
-        <input id="${inputBarId}" type="search" autofocus>
-        <button type="submit" disabled style="display: none" aria-hidden="true"></button>
-    </div>
-    <div>
-        <button id="alias-button">Rename Class Aliases</button>
     </div>
 </div>
 `
@@ -187,7 +187,9 @@ function injectSearch() {
         })
 
         document.addEventListener("keyup", (event) => {
-            if (event.key == "/") {
+            //For some reason, browsers will select the teacher checkbox as the first active element
+            //Funky behavior
+            if (event.key === "/") {
                 //This checks whether home page is hidden. Useful for when pages have multiple
                 //<c-wiz> elements and you only want to focus when <c-wiz> is visible
                 if (cwizElement?.getAttribute("aria-hidden") === "true") {
@@ -195,22 +197,24 @@ function injectSearch() {
                 }
 
                 //If user is focused on a typeable element, do not focus search
-                if (document.activeElement.matches(`input, div[role="textbox"], textarea`)) {
+                if (document.activeElement.matches(`input[type="text"], div[role="textbox"], textarea`)) {
                     return
                 }
 
                 searchBar.focus()
             }
 
-            let input = searchBar.value.toLowerCase()
-            let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-            roomNodes.forEach((element) => {
-                if (matchRoom(element, input, userOptions.read())) {
-                    element.style.display = 'flex'
-                } else {
-                    element.style.display = 'none'
-                }
-            })
+            if (document.activeElement === searchBar) {
+                let input = searchBar.value.toLowerCase()
+                let roomNodes = roomList.querySelectorAll(roomNodeSelector)
+                roomNodes.forEach((element) => {
+                    if (matchRoom(element, input, userOptions.read())) {
+                        element.style.display = 'flex'
+                    } else {
+                        element.style.display = 'none'
+                    }
+                })
+            }
         })
     })  
 }
