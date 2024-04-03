@@ -188,12 +188,17 @@ function injectSearch() {
 
         document.addEventListener("keyup", (event) => {
             if (event.key == "/") {
-                //This checks whether home page is hidden. When creating a new class as teacher,
-                //user stays on the same <c-wiz>, but the creation pop-up makes c-wiz have class aria-hidden.
-                //pressing / in creation popup will focus the darkened searchbar.
+                //This checks whether home page is hidden. Useful for when pages have multiple
+                //<c-wiz> elements and you only want to focus when <c-wiz> is visible
                 if (cwizElement?.getAttribute("aria-hidden") === "true") {
                     return //Do not focus searchbar
                 }
+
+                //If user is focused on a typeable element, do not focus search
+                if (document.activeElement.matches(`input, div[role="textbox"], textarea`)) {
+                    return
+                }
+
                 searchBar.focus()
             }
 
