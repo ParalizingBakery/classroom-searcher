@@ -2,7 +2,7 @@
     "manifest_version" : 3,
     "name": "Classroom Searcher For Google Classroom",
     "description": "Search classes you enrolled or teach in Google Classroom.",
-    "version": "3.8",
+    "version": "4.0",
     "permissions": [
         "storage"
     ],
