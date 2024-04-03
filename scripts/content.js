@@ -91,7 +91,7 @@ const html = `
         <strong>Class name </strong> or
         <input type="checkbox" id="${teacherCheckboxId}" checked autocomplete="off"></input>
         <strong>Teacher name</strong></legend>
-        <legend>/ to focus, Tab + Enter for first result</legend>
+        <legend>/ to focus, Tab 2x + Enter for first result</legend>
         <input id="${inputBarId}" type="search" autofocus>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
     </div>
