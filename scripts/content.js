@@ -474,28 +474,44 @@ class AliasInject {
                 return
             }
 
-            //Remove alias if blank string (reset)
-            if (newAlias === "") {
-                delete this.aliases[classId]
-            } else {
-                /** @type {classAlias}} */
-                let storeValue = {
-                    //Blank strings are falsy
-                    className: newAlias ? newAlias : null,
-                    originalName: this.renamer.selectedRoom.originalName
-                }
-                this.aliases[classId] = storeValue
+            /** @type {classAlias}} */
+            let storeValue = {
+                //Blank strings are falsy
+                className: newAlias ? newAlias : null,
+                originalName: this.renamer.selectedRoom.originalName
             }
+
+            this.aliases[classId] = storeValue
             
             //Update alias in storage
-            //This fufills with nothing when successful
-            browser.storage.local.set({
-                [storageAliasKey]: this.aliases
-            }).then(() => {
-                resolve(true)
-            })
-            .catch((reason) => {
-                reject(new Error(`AliasInject.write : setting key ${storageAliasKey} as ${JSON.stringify(storeValue)} because ${reason}`))
+            //Join this.aliases with storage because using aliases in archive page is a different object
+            browser.storage.local.get({[storageAliasKey]: {}})
+            .then((result) => {
+                let storageAlias = result[storageAliasKey]
+
+                /** @type {Object.<string, classAlias>}*/
+                let joinedAliases = {
+                    ...storageAlias,
+                    ...this.aliases
+                }
+
+                //Remove the null alias
+                for (const id in joinedAliases) {
+                    if (joinedAliases[id].className === null) {
+                        delete joinedAliases[id]
+                    }
+                }
+
+                //Write to storage
+                //This fufills with nothing when successful
+                browser.storage.local.set({
+                    [storageAliasKey]: joinedAliases
+                }).then(() => {
+                    resolve(true)
+                })
+                .catch((reason) => {
+                    reject(new Error(`AliasInject.write : setting key ${storageAliasKey} as ${JSON.stringify(storeValue)} because ${reason}`))
+                })
             })
         })
     }
