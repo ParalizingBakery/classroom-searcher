@@ -179,7 +179,11 @@ function injectSearch() {
                 //Rename classes when roomList changes
                 classAlias.injectAliases()
             })
-            AliasInjector.observe(classAlias.cwizElement.querySelector(roomListSelector), {childList: true})
+
+            //Inject when changes to <c-wiz> attributes
+            //When page is fully loaded, jsdata = "deferred-c3"
+            //When page is returned to, aria-hidden is switched from false to true
+            AliasInjector.observe(classAlias.cwizElement,{attributes:true})
         
         }).catch((reason) => {
             console.error(reason)
@@ -466,14 +470,18 @@ class AliasInject {
                 return
             }
 
-            /** @type {classAlias}} */
-            let storeValue = {
-                //Blank strings are falsy
-                className: newAlias ? newAlias : null,
-                originalName: this.renamer.selectedRoom.originalName
+            //Remove alias if blank string (reset)
+            if (newAlias === "") {
+                delete this.aliases[classId]
+            } else {
+                /** @type {classAlias}} */
+                let storeValue = {
+                    //Blank strings are falsy
+                    className: newAlias ? newAlias : null,
+                    originalName: this.renamer.selectedRoom.originalName
+                }
+                this.aliases[classId] = storeValue
             }
-    
-            this.aliases[classId] = storeValue
             
             //Update alias in storage
             //This fufills with nothing when successful
