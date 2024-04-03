@@ -102,9 +102,6 @@ const html = `
                     <input type="text" id="alias-class-search">
                 </div>
                 <ul class="alias-class-results mb-1">
-                    <li><a href="https://google.com" target="_blank">A1 CEFR English Classroom</a> - John Doe asdfasdf sadf asdf asdf asdf asdfasdfasdf asdf asdf <button>Select</button></li>
-                    <li>A1 CEFR English Classroom - John Doe <button>Select</button></li>
-                    <li>A1 CEFR English Classroom - John Doe <button>Select</button></li>
                 </ul>
                 <div class="mb-1">
                     <p>Rename (Selected Class) to</p>
