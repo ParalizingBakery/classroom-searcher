@@ -416,7 +416,11 @@ class AliasInject {
                 this.injectAliases()
 
                 //Success Message
-                saveButton.textContent = `Renamed ${this.renamer.selectedRoom.id} to ${renameInput.value}`
+                if (renameInput.value === "") {
+                    saveButton.textContent = `Reset ${this.renamer.selectedRoom.id} to its orignal name`
+                } else {
+                    saveButton.textContent = `Renamed ${this.renamer.selectedRoom.id} to ${renameInput.value}`
+                }
             }).catch((error) => {
                 console.error(error)
             })
