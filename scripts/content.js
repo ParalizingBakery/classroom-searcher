@@ -108,7 +108,7 @@ const html = `
                 </ul>
                 <div class="mb-1">
                     <p>Rename (Selected Class) to</p>
-                    <input type="text" id="alias-class-rename">
+                    <input type="text" id="alias-class-rename" placeholder="Leave blank to reset">
                     <button id="alias-save-button">Save</button>
                 </div>
             </div>
