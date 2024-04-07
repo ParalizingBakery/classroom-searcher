@@ -165,7 +165,11 @@ function bodyChildChange (records, observer) {
     }
     */
 }
-
+/**
+ * Given a roomList, will inject searching, options, and alias functionality.
+ * @param {HTMLUListElement} roomList
+ * @returns {void}
+ */
 function injectSearch(roomList) {
     //home and archived page will have "roomList"
     //see if already have search
@@ -184,7 +188,6 @@ function injectSearch(roomList) {
         //Initialzes the modal
         classAlias.initHTML()
 
-        
         const AliasInjector = new MutationObserver(()=>{
             //Get original room names in this.aliases
             try {
