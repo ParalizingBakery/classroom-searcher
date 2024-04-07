@@ -188,7 +188,14 @@ function injectSearch(roomList) {
         //Initialzes the modal
         classAlias.initHTML()
 
-        const AliasInjector = new MutationObserver(()=>{
+        const AliasInjector = new MutationObserver((records, observer)=>{
+            //Assume records is not empty 
+            //Assume observer will only be used on c-wiz
+            //deferred-c3 means everything is loaded in c-wiz
+            if (records[0].target.getAttribute("jsdata") !== "deferred-c3") {
+                return
+            }
+
             //Get original room names in this.aliases
             try {
                 classAlias.setOriginalNames()
@@ -555,7 +562,7 @@ class AliasInject {
      */
     setOriginalNames(updateArray = Object.keys(this.aliases)) {
         // If attempting all aliases, aliasInject must not have ran
-        if (updateArray === Object.keys(this.aliases)) {
+        if (updateArray === Object.keys(this.aliases) && this.renamer.hasInjectedAlias) {
             throw new Error(`AliasInject.setOriginalNames() : attempted to get all original names when injectAlias already ran`)
         }
 
