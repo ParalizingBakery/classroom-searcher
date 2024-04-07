@@ -141,82 +141,98 @@ const html = `
 function main(){
     //the parameter for callback is iterable, if you want to do smth for each mutaition please use for .. of ..
     //doing this for every mutation in record is redundant for now
-    const observer = new MutationObserver(injectSearch)
+    const observer = new MutationObserver(bodyChildChange)
     //GC adds a new <c-wiz> element when you navigate to a new page (part?) of the website.
     //there may or may not be a new <c-wiz> with roomList everytime observer is triggered
     observer.observe(document.querySelector("body"), {childList: true})
 }
-
-function injectSearch() {
-    //home and archived page will have "roomList"
+/**
+ * 
+ * @param {MutationRecord[]} records 
+ * @param {MutationObserver} observer 
+ */
+function bodyChildChange (records, observer) {
+    //Run for every observation
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
-        //see if already have search
-        if (roomList.parentElement.querySelector("." + searchAppClass)) {
-            return
+        injectSearch(roomList)
+    })
+
+    //Run for every record (currently not in use)
+    /*
+    for (let index = 0, length = records.length; index < length; index++) {
+        const record = records[index]
+    }
+    */
+}
+
+function injectSearch(roomList) {
+    //home and archived page will have "roomList"
+    //see if already have search
+    if (roomList.parentElement.querySelector("." + searchAppClass)) {
+        return
+    }
+    
+    roomList.insertAdjacentHTML("beforebegin", html)
+
+    let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
+    let cwizElement = roomList.closest("c-wiz")
+    let userOptions = new UserOptions(cwizElement)
+    let classAlias = new AliasInject(cwizElement)
+
+    classAlias.getStoredAliases().then((aliases) => {
+        //Initialzes the modal
+        classAlias.initHTML()
+
+        
+        const AliasInjector = new MutationObserver(()=>{
+            //Get original room names in this.aliases
+            try {
+                classAlias.setOriginalNames()
+            } catch {}
+            //Rename classes when roomList changes
+            classAlias.injectAliases()
+        })
+
+        //Inject when changes to <c-wiz> attributes
+        //When page is fully loaded, jsdata = "deferred-c3"
+        //When page is returned to, aria-hidden is switched from false to true
+        AliasInjector.observe(classAlias.cwizElement,{attributes:true})
+    
+    }).catch((reason) => {
+        console.error(reason)
+    })
+
+    document.addEventListener("keyup", (event) => {
+        //For some reason, browsers will select the teacher checkbox as the first active element
+        //Funky behavior
+        if (event.key === "/") {
+            //This checks whether home page is hidden. Useful for when pages have multiple
+            //<c-wiz> elements and you only want to focus when <c-wiz> is visible
+            if (cwizElement?.getAttribute("aria-hidden") === "true") {
+                return //Do not focus searchbar
+            }
+
+            //If user is focused on a typeable element, do not focus search
+            if (document.activeElement.matches(`input[type="text"], div[role="textbox"], textarea`)) {
+                return
+            }
+
+            searchBar.focus()
         }
-        
-        roomList.insertAdjacentHTML("beforebegin", html)
 
-        let searchBar = roomList.parentElement.querySelector("#" + inputBarId)
-        let cwizElement = roomList.closest("c-wiz")
-        let userOptions = new UserOptions(cwizElement)
-        let classAlias = new AliasInject(cwizElement)
-
-        classAlias.getStoredAliases().then((aliases) => {
-            //Initialzes the modal
-            classAlias.initHTML()
-
-            
-            const AliasInjector = new MutationObserver(()=>{
-                //Get original room names in this.aliases
-                try {
-                    classAlias.setOriginalNames()
-                } catch {}
-                //Rename classes when roomList changes
-                classAlias.injectAliases()
+        if (document.activeElement === searchBar) {
+            let input = searchBar.value.toLowerCase()
+            let roomNodes = roomList.querySelectorAll(roomNodeSelector)
+            roomNodes.forEach((element) => {
+                if (matchRoom(element, input, userOptions.read())) {
+                    element.style.display = 'flex'
+                } else {
+                    element.style.display = 'none'
+                }
             })
-
-            //Inject when changes to <c-wiz> attributes
-            //When page is fully loaded, jsdata = "deferred-c3"
-            //When page is returned to, aria-hidden is switched from false to true
-            AliasInjector.observe(classAlias.cwizElement,{attributes:true})
-        
-        }).catch((reason) => {
-            console.error(reason)
-        })
-
-        document.addEventListener("keyup", (event) => {
-            //For some reason, browsers will select the teacher checkbox as the first active element
-            //Funky behavior
-            if (event.key === "/") {
-                //This checks whether home page is hidden. Useful for when pages have multiple
-                //<c-wiz> elements and you only want to focus when <c-wiz> is visible
-                if (cwizElement?.getAttribute("aria-hidden") === "true") {
-                    return //Do not focus searchbar
-                }
-
-                //If user is focused on a typeable element, do not focus search
-                if (document.activeElement.matches(`input[type="text"], div[role="textbox"], textarea`)) {
-                    return
-                }
-
-                searchBar.focus()
-            }
-
-            if (document.activeElement === searchBar) {
-                let input = searchBar.value.toLowerCase()
-                let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-                roomNodes.forEach((element) => {
-                    if (matchRoom(element, input, userOptions.read())) {
-                        element.style.display = 'flex'
-                    } else {
-                        element.style.display = 'none'
-                    }
-                })
-            }
-        })
-    })  
+        }
+    })
 }
 
 class UserOptions {
