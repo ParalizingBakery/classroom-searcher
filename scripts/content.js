@@ -588,29 +588,6 @@ class AliasInject {
 }
 
 /**
- * Methods for improving Google classroom (Mostly for Firefox)
- */
-class ClassroomQOL {
-    //Add tab support for Google Classroom on Firefox (No idea why it does not work)
-    static tabs = {
-        makeRoomNodeTabbable(roomNode) {
-            let roomNameNode = roomNode.querySelector(roomNameSelector)
-            this.addTabIndex(roomNameNode)
-        },
-        addTabIndex(element) {
-            if (!(element instanceof HTMLElement)) {
-                return null
-            }
-            element.tabIndex = 0
-            return element
-        },
-        
-        a : () => {
-            t
-        }
-    }
-}
-/**
  * Matches a string input with the room name and/or teacher name of a Google Classroom li element that contains each room.
  * 
  * @param {HTMLLIElement} roomNode 
