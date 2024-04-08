@@ -29,6 +29,10 @@ const html = `
         line-height: normal;
     }
 
+    .${searchAppClass} :focus {
+        outline: 1px solid
+    }
+
     legend {
         font-size: 1rem;
     }
