@@ -114,7 +114,7 @@ const html = `
         <div class="modal-content">
             <div class="modal-content-header">
                 <p>Rename Class Aliases<p>
-                <button id="modal-return">Return</button>
+                <button class="modal-return">Return</button>
             </div>
             <div class="modal-content-body">
                 <p class="mb-1">
@@ -141,7 +141,7 @@ const html = `
         <div class="modal-content">
             <div class="modal-content-header">
                 <p>Rename Class Aliases (From Source)<p>
-                <button class="modal-source-return">Return</button>
+                <button class="modal-return">Return</button>
             </div>
             <div class="modal-content-body">
                 <p class="mb-1">
@@ -385,6 +385,9 @@ class AliasInject {
         /** @type {HTMLDivElement} */
         let modal = this.cwizElement.querySelector("div#alias-modal")
 
+        /** @type {HTMLDivElement} */
+        let modalSource = this.cwizElement.querySelector("div.alias-source")
+
         /** @type {HTMLInputElement} */
         let searchInput = this.cwizElement.querySelector("input#alias-class-search")
 
@@ -399,9 +402,17 @@ class AliasInject {
             modal.style.display = "block"
         })
 
-        //Modal Disable
-        this.cwizElement.querySelector("#modal-return").addEventListener('click', () => {
-            modal.style.display = "none"
+        this.cwizElement.querySelector("button.alias-source-enable").addEventListener('click', (event) => {
+            modalSource.style.display  = "block"
+        })
+
+        // General Modal Disable (using element.closest())
+        // For specific actions, add another listener or add if inside
+        this.cwizElement.querySelectorAll("button.modal-return").forEach((element) => {
+            let buttonModal = element.closest(".modal")
+            element.addEventListener('click', () => {
+                buttonModal.style.display = "none"
+            })
         })
 
         //Room Search Input Listener
