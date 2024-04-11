@@ -379,34 +379,42 @@ class AliasInject {
         })
     }
 
-    // DEBT : make elements contained in objects, possibly this.elements
     initHTML() {
         const MAX_ROOM_SEARCH_LI = 3
 
-        /** @type {HTMLDivElement} */
-        let modalSingle = this.cwizElement.querySelector("div#alias-modal")
+        /**
+        * @type {{
+        *   single: HTMLDivElement
+        *   source: HTMLDivElement
+        * }}
+        */
+        let modals = {
+            single: this.cwizElement.querySelector("div.alias-single"),
+            source: this.cwizElement.querySelector("div.alias-source")
+        }
 
-        /** @type {HTMLDivElement} */
-        let modalSource = this.cwizElement.querySelector("div.alias-source")
-
-        /** @type {HTMLInputElement} */
-        let searchInput = this.cwizElement.querySelector("input#alias-class-search")
-
-        /** @type {HTMLInputElement}*/
-        let renameInput = this.cwizElement.querySelector("input#alias-class-rename")
-
-        /** @type {HTMLButtonElement} */
-        let saveButton = this.cwizElement.querySelector("button#alias-save-button")
-
+        /** 
+        * @type {{
+        *   singleSearch : HTMLInputElement,
+        *   singleSave : HTMLButtonElement,
+        *   singleRename : HTMLButtonElement
+        * }}
+        */
+        let inputs = {
+            singleSearch : modals.single.querySelector("input#alias-class-search"),
+            singleSave : modals.single.querySelector("button#alias-save-button"),
+            singleRename : modals.single.querySelector("input#alias-class-rename")
+        }
+    
         //Modal Enable 
         this.cwizElement.querySelector("#alias-button").addEventListener('click', () => {
-            modalSingle.style.display = "block"
+            modals.single.style.display = "block"
         })
 
         this.cwizElement.querySelector("button.alias-source-enable").addEventListener('click', (event) => {
             // display: "none" because it's possible to tab to Single while in Source
-            modalSource.style.display = "block"
-            modalSingle.style.display = "none"
+            modals.source.style.display = "block"
+            modals.single.style.display = "none"
         })
 
         // General Modal Disable (using element.closest())
@@ -422,13 +430,13 @@ class AliasInject {
             // Enable single modal (display:none'd by alias-source-enable)
             if (buttonModal.classList.contains("alias-source")) {
                 element.addEventListener('click', () => {
-                    modalSingle.style.display = "block"
+                    modals.single.style.display = "block"
                 })
             }
         })
 
         //Room Search Input Listener
-        searchInput.addEventListener('keyup', (event) => {
+        inputs.singleSearch.addEventListener('keyup', (event) => {
             let roomNodeAll = this.cwizElement.querySelectorAll(roomNodeSelector)
             let ulResults = this.cwizElement.querySelector("ul.alias-class-results")
 
@@ -443,7 +451,7 @@ class AliasInject {
                 let roomNode = roomNodeAll[i]
 
                 //Doesn't match search
-                if (!matchRoom(roomNode, searchInput.value, {matchTeacher: false})) {
+                if (!matchRoom(roomNode, inputs.singleSearch.value, {matchTeacher: false})) {
                     continue
                 }
 
@@ -493,29 +501,32 @@ class AliasInject {
             }
         })
 
-        //Alias Save Button
-        saveButton.addEventListener("click", (event) => {
+        //Alias-Single Save Button
+        inputs.singleSave.addEventListener("click", (event) => {
             //Write alias in storage
             if (typeof this.renamer.selectedRoom.id !== "string") {
-                saveButton.textContent = "Room Not Selected"
+                inputs.singleSave.textContent = "Room Not Selected"
                 return
             }
 
-            this.write(this.renamer.selectedRoom.id, renameInput.value)
+            this.write(this.renamer.selectedRoom.id, inputs.singleRename.value)
             .then((status) => {
                 //Reinject Aliases
                 this.injectAliases()
 
                 //Success Message
-                if (renameInput.value === "") {
-                    saveButton.textContent = `Reset ${this.renamer.selectedRoom.id} to its orignal name`
+                if (inputs.singleRename.value === "") {
+                    inputs.singleSave.textContent = `Reset ${this.renamer.selectedRoom.id} to its orignal name`
                 } else {
-                    saveButton.textContent = `Renamed ${this.renamer.selectedRoom.id} to ${renameInput.value}`
+                    inputs.singleSave.textContent = `Renamed ${this.renamer.selectedRoom.id} to ${inputs.singleRename.value}`
                 }
             }).catch((error) => {
                 console.error(error)
             })
         })
+
+        //Alias-Source Save button
+        
     }
 
     /**
