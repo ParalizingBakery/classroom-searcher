@@ -456,6 +456,8 @@ class AliasInject {
                 }
 
                 //Information
+                // WARNING : This is considered user input (Stored XSS, SQL Injection)
+                // PLEASE SANITIZE for purposes that is not setting with .textContent or text node,
                 let roomName = roomNode.querySelector(roomNameSelector)?.textContent ?? "Room Name Error"
                 let roomTeacher = roomNode.querySelector(roomTeacherSelector)?.textContent ?? "Room Teacher Error"
                 let roomAnchor = roomNode.querySelector(`${roomNodeHeaderSelector} > div > a`)
