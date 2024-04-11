@@ -84,6 +84,14 @@ const html = `
         padding-left: 15px;
     }
 
+    .modal-source-textarea {
+        height: 120px
+    }
+
+    .full-width {
+        width: 100%;
+    }
+
     .mb-1 {
         margin-bottom: 1em;
     }
@@ -102,7 +110,7 @@ const html = `
     <div>
         <button id="alias-button">Rename Class Aliases</button>
     </div>
-    <div class="modal" id="alias-modal">
+    <div class="modal alias-single" id="alias-modal">
         <div class="modal-content">
             <div class="modal-content-header">
                 <p>Rename Class Aliases<p>
@@ -125,6 +133,30 @@ const html = `
                     <input type="text" id="alias-class-rename" placeholder="Leave blank to reset">
                     <button id="alias-save-button">Save</button>
                 </div>
+                <button class="alias-source-enable">Edit from source</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal alias-source">
+        <div class="modal-content">
+            <div class="modal-content-header">
+                <p>Rename Class Aliases (From Source)<p>
+                <button class="modal-source-return">Return</button>
+            </div>
+            <div class="modal-content-body">
+                <p class="mb-1">
+                    Rename classes from the source (what is stored in storage)
+                </p>
+                <p class="mb-1" style="color:red">
+                    Edit at your own risk
+                </p>
+                <p class="mb-1">
+                    Copy-Paste to other devices to "sync"
+                </p>
+                <div class="mb-1">
+                    <textarea class="modal-source-textarea full-width"></textarea>
+                </div>
+                <button class="modal-source-save">Save</button>
             </div>
         </div>
     </div>
