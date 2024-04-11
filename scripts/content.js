@@ -379,11 +379,12 @@ class AliasInject {
         })
     }
 
+    // DEBT : make elements contained in objects, possibly this.elements
     initHTML() {
         const MAX_ROOM_SEARCH_LI = 3
 
         /** @type {HTMLDivElement} */
-        let modal = this.cwizElement.querySelector("div#alias-modal")
+        let modalSingle = this.cwizElement.querySelector("div#alias-modal")
 
         /** @type {HTMLDivElement} */
         let modalSource = this.cwizElement.querySelector("div.alias-source")
@@ -399,20 +400,31 @@ class AliasInject {
 
         //Modal Enable 
         this.cwizElement.querySelector("#alias-button").addEventListener('click', () => {
-            modal.style.display = "block"
+            modalSingle.style.display = "block"
         })
 
         this.cwizElement.querySelector("button.alias-source-enable").addEventListener('click', (event) => {
-            modalSource.style.display  = "block"
+            // display: "none" because it's possible to tab to Single while in Source
+            modalSource.style.display = "block"
+            modalSingle.style.display = "none"
         })
 
         // General Modal Disable (using element.closest())
-        // For specific actions, add another listener or add if inside
+        // For specific actions, add another listener
         this.cwizElement.querySelectorAll("button.modal-return").forEach((element) => {
+            // Declare in this scope to search once, use many (closure)
             let buttonModal = element.closest(".modal")
+
             element.addEventListener('click', () => {
                 buttonModal.style.display = "none"
             })
+
+            // Enable single modal (display:none'd by alias-source-enable)
+            if (buttonModal.classList.contains("alias-source")) {
+                element.addEventListener('click', () => {
+                    modalSingle.style.display = "block"
+                })
+            }
         })
 
         //Room Search Input Listener
