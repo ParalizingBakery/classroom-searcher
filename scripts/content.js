@@ -341,6 +341,9 @@ class UserOptions {
     }
 }
 
+/**
+ * Process for injection of aliases. Call getStoredAliases(), returning a promise, before doing anything.
+ */
 class AliasInject {
     constructor (cwizElement) {
         if (!(cwizElement instanceof HTMLElement) || (cwizElement.tagName.toLowerCase() !== "c-wiz")) {
