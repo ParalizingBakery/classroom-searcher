@@ -225,19 +225,21 @@ function injectSearch(roomList) {
         classAlias.initHTML()
 
         const AliasInjector = new MutationObserver((records, observer)=>{
-            //Assume records is not empty 
             //Assume observer will only be used on c-wiz
             //deferred-c3 means everything is loaded in c-wiz
-            if (records[0].target.getAttribute("jsdata") !== "deferred-c3") {
-                return
-            }
+            const allowedJsData = ["deferred-c3", "deferred-c5"]
+            //get attribute from the last change
+            let record = records[records.length - 1]
+                if (!(allowedJsData.includes(record.target.getAttribute("jsdata")))) {
+                    return
+                }
+                //Get original room names in this.aliases
+                if (!classAlias.renamer.hasInjectedAlias) {
+                    classAlias.setOriginalNames()
+                }
 
-            //Get original room names in this.aliases
-            try {
-                classAlias.setOriginalNames()
-            } catch {}
-            //Rename classes when roomList changes
-            classAlias.injectAliases()
+                //Rename classes when roomList changes
+                classAlias.injectAliases()
         })
 
         //Inject when changes to <c-wiz> attributes
@@ -643,17 +645,21 @@ class AliasInject {
                     ...this.aliases
                 }
 
-                //Remove the null alias
+                // Separate aliases to keep null names in this.aliases
+                // Used in returning classes to their original names
+                let trimmedAlias = {}
+
+                // Copy only named alias
                 for (const id in this.aliases) {
-                    if (this.aliases[id].className === null) {
-                        delete this.aliases[id]
+                    if (this.aliases[id].className !== null) {
+                        trimmedAlias[id] = this.aliases[id]
                     }
                 }
 
                 //Write to storage
                 //This fufills with nothing when successful
                 browser.storage.local.set({
-                    [storageAliasKey]: this.aliases
+                    [storageAliasKey]: trimmedAlias
                 }).then(() => {
                     resolve(true)
                 })
