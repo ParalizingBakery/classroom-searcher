@@ -638,22 +638,22 @@ class AliasInject {
                 let storageAlias = result[storageAliasKey]
 
                 /** @type {Object.<string, classAlias>}*/
-                let joinedAliases = {
+                this.aliases = {
                     ...storageAlias,
                     ...this.aliases
                 }
 
                 //Remove the null alias
-                for (const id in joinedAliases) {
-                    if (joinedAliases[id].className === null) {
-                        delete joinedAliases[id]
+                for (const id in this.aliases) {
+                    if (this.aliases[id].className === null) {
+                        delete this.aliases[id]
                     }
                 }
 
                 //Write to storage
                 //This fufills with nothing when successful
                 browser.storage.local.set({
-                    [storageAliasKey]: joinedAliases
+                    [storageAliasKey]: this.aliases
                 }).then(() => {
                     resolve(true)
                 })
