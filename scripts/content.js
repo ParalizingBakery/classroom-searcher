@@ -623,15 +623,6 @@ class AliasInject {
             if ((typeof classId !== "string") || (typeof newAlias !== "string")) {
                 return
             }
-
-            /** @type {classAlias}} */
-            let storeValue = {
-                //Blank strings are falsy
-                className: newAlias ? newAlias : null,
-                originalName: this.renamer.selectedRoom.originalName
-            }
-
-            this.aliases[classId] = storeValue
             
             //Update alias in storage
             //Join this.aliases with storage because using aliases in archive page is a different object
@@ -641,9 +632,18 @@ class AliasInject {
 
                 /** @type {Object.<string, classAlias>}*/
                 this.aliases = {
-                    ...storageAlias,
-                    ...this.aliases
+                    ...this.aliases,
+                    ...storageAlias
                 }
+
+                /** @type {classAlias}} */
+                let storeValue = {
+                    //Blank strings are falsy
+                    className: newAlias ? newAlias : null,
+                    originalName: this.renamer.selectedRoom.originalName
+                }
+
+                this.aliases[classId] = storeValue
 
                 // Separate aliases to keep null names in this.aliases
                 // Used in returning classes to their original names
