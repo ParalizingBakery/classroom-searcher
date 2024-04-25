@@ -400,24 +400,36 @@ class AliasInject {
         * @type {{
         *   singleSearch : HTMLInputElement,
         *   singleSave : HTMLButtonElement,
-        *   singleRename : HTMLButtonElement
+        *   singleRename : HTMLButtonElement,
+        *   singleEnable : HTMLButtonElement,
+        *   sourceSave : HTMLButtonElement,
+        *   sourceTextArea : HTMLTextAreaElement,
+        *   sourceEnable : HTMLButtonElement
         * }}
         */
         let inputs = {
             singleSearch : modals.single.querySelector("input#alias-class-search"),
             singleSave : modals.single.querySelector("button#alias-save-button"),
-            singleRename : modals.single.querySelector("input#alias-class-rename")
+            singleRename : modals.single.querySelector("input#alias-class-rename"),
+            singleEnable : this.cwizElement.querySelector("button#alias-button"),
+            sourceSave : modals.source.querySelector("button.modal-source-save"),
+            sourceTextArea : modals.source.querySelector("textarea.modal-source-textarea"),
+            sourceEnable : modals.single.querySelector("button.alias-source-enable")
         }
     
-        //Modal Enable 
-        this.cwizElement.querySelector("#alias-button").addEventListener('click', () => {
+        // Single Modal Enable 
+        inputs.singleEnable.addEventListener('click', () => {
             modals.single.style.display = "block"
         })
 
-        this.cwizElement.querySelector("button.alias-source-enable").addEventListener('click', (event) => {
+        // Source modal enable
+        inputs.sourceEnable.addEventListener('click', (event) => {
             // display: "none" because it's possible to tab to Single while in Source
             modals.source.style.display = "block"
             modals.single.style.display = "none"
+
+            // Set value to this.aliases
+            inputs.sourceTextArea.value = JSON.stringify(this.aliases, null, 2)
         })
 
         // General Modal Disable (using element.closest())
@@ -531,7 +543,36 @@ class AliasInject {
         })
 
         //Alias-Source Save button
-        
+        inputs.sourceSave.addEventListener("click", () => {
+            let input = inputs.sourceTextArea.value
+
+            // Parsing
+            let parsedInput = {}
+            try {
+                parsedInput = JSON.parse(input)
+            } catch (error) {
+                // Handle Json error
+                if (error instanceof SyntaxError) {
+                    inputs.sourceSave.textContent = `Invalid JSON : ${error.message}`
+                } else {
+                    inputs.sourceSave.textContent = `${error}`
+                }
+
+                // Abort Function
+                return
+            }
+
+            // Writing to storage
+            browser.storage.local.set({[storageAliasKey]: parsedInput})
+            .then(()=>{
+                this.aliases = parsedInput
+                this.injectAliases()
+                inputs.sourceSave.textContent = `Storage Save Successful`
+            })
+            .catch(()=>{
+                inputs.sourceSave.textContent = `Storage Save Failed`
+            })
+        })
     }
 
     /**
