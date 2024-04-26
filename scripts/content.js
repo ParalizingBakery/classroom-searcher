@@ -374,6 +374,7 @@ class AliasInject {
         return new Promise((resolve, reject) => {
             browser.storage.local.get({[storageAliasKey]: {}})
             .then((result) => {
+                /// this.aliases currently does not contain originalName
                 /** @type {Object.<string, classAlias>}*/
                 this.aliases = result[storageAliasKey]
                 resolve(this.aliases)
@@ -569,7 +570,7 @@ class AliasInject {
             .then(()=>{
                 this.aliases = parsedInput
                 this.injectAliases()
-                inputs.sourceSave.textContent = `Storage Save Successful`
+                inputs.sourceSave.textContent = `Storage Save Successful. Refresh to prevent errors`
             })
             .catch(()=>{
                 inputs.sourceSave.textContent = `Storage Save Failed`
@@ -649,10 +650,12 @@ class AliasInject {
                 // Used in returning classes to their original names
                 let trimmedAlias = {}
 
-                // Copy only named alias
+                // Copy only named alias without orignal name
                 for (const id in this.aliases) {
                     if (this.aliases[id].className !== null) {
-                        trimmedAlias[id] = this.aliases[id]
+                        trimmedAlias[id] = {
+                            className: this.aliases[id].className
+                        }
                     }
                 }
 
