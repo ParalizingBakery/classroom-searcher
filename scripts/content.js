@@ -223,23 +223,20 @@ function injectSearch(roomList) {
     classAlias.getStoredAliases().then((aliases) => {
         //Initialzes the modal
         classAlias.initHTML()
+        classAlias.initJsdataTracker()
 
         const AliasInjector = new MutationObserver((records, observer)=>{
             //Assume observer will only be used on c-wiz
-            //deferred-c3 means everything is loaded in c-wiz
-            const allowedJsData = ["deferred-c3", "deferred-c5"]
-            //get attribute from the last change
-            let record = records[records.length - 1]
-                if (!(allowedJsData.includes(record.target.getAttribute("jsdata")))) {
-                    return
-                }
-                //Get original room names in this.aliases
-                if (!classAlias.renamer.hasInjectedAlias) {
-                    classAlias.setOriginalNames()
-                }
+            if (!classAlias.renamer.pageFullyLoaded) {
+                return
+            }
+            //Get original room names in this.aliases
+            if (!classAlias.renamer.hasInjectedAlias) {
+                classAlias.setOriginalNames()
+            }
 
-                //Rename classes when roomList changes
-                classAlias.injectAliases()
+            //Rename classes when roomList changes
+            classAlias.injectAliases()
         })
 
         //Inject when changes to <c-wiz> attributes
@@ -355,6 +352,7 @@ class AliasInject {
         this.cwizElement = cwizElement
         this.renamer = {
             hasInjectedAlias: false,
+            pageFullyLoaded: false,
             selectedRoom: {
                 id: null,
                 originalName: null
@@ -576,6 +574,30 @@ class AliasInject {
                 inputs.sourceSave.textContent = `Storage Save Failed`
             })
         })
+    }
+
+    /**
+     * Initializes a mutationObserver that tracks changes to jsdata.
+     * Currently, when the observer sees one change to jsdata, it is usually
+     * when the page is fully loaded.
+     * 
+     * C-wiz created with lower jsdata value (c0, but can be any value in order of user navigation) 
+     * -> roomList inserted -> injectSearch() Activated -> init called, start observation ->
+     * page fully loaded, change jsdata to higher value (c3, but see above reason)  
+     */
+    initJsdataTracker() {
+        let tracker = new MutationObserver((records, observer) => {
+            for (const record of records) {
+                // Check attribute name, just to be safe
+                if (record.attributeName === "jsdata") {
+                    this.renamer.pageFullyLoaded = true
+                }
+            }
+
+            observer.disconnect()
+        })
+    
+        tracker.observe(this.cwizElement, {attributes: true, attributeFilter:["jsdata"]})
     }
 
     /**
