@@ -563,10 +563,24 @@ class AliasInject {
                 return
             }
 
+            // Set aliases to parsed before 
+            this.aliases = parsedInput
+
+            // Trim original name before writing to storage
+            let trimmedAlias = {}
+
+            // Copy only named alias without orignal name
+            for (const id in this.aliases) {
+                if (this.aliases[id].className !== null) {
+                    trimmedAlias[id] = {
+                        className: this.aliases[id].className
+                    }
+                }
+            }
+
             // Writing to storage
-            browser.storage.local.set({[storageAliasKey]: parsedInput})
+            browser.storage.local.set({[storageAliasKey]: trimmedAlias})
             .then(()=>{
-                this.aliases = parsedInput
                 this.injectAliases()
                 inputs.sourceSave.textContent = `Storage Save Successful. Refresh to prevent errors`
             })
