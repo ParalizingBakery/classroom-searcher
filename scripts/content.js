@@ -251,7 +251,7 @@ function injectSearch(roomList) {
         console.error(reason)
     })
 
-    document.addEventListener("keyup", (event) => {
+    document.addEventListener("keydown", (event) => {
         //For some reason, browsers will select the teacher checkbox as the first active element
         //Funky behavior
         if (event.key === "/") {
@@ -260,13 +260,14 @@ function injectSearch(roomList) {
             if (cwizElement?.getAttribute("aria-hidden") === "true") {
                 return //Do not focus searchbar
             }
-
+            
             //If user is focused on a typeable element, do not focus search
-            if (document.activeElement.matches(`input[type="text"], div[role="textbox"], textarea`)) {
+            if (document.activeElement.matches(`input, div[role="textbox"], textarea`)) {
                 return
             }
-
+            
             searchBar.focus()
+            event.preventDefault()
         }
 
         if (document.activeElement === searchBar) {
@@ -281,6 +282,22 @@ function injectSearch(roomList) {
             })
         }
     })
+
+    // For some reason, the first input in page (classname checkbox) gets focused on fully load
+    // "focused" html attribute will not work
+    // If focusing input, "/" to search listener will not focus searchbar
+    let focusByDefault = new MutationObserver((records, observer) => {
+        // Any element here to focus
+        let elementFocus = searchBar
+
+        // Focus and disconnect
+        elementFocus.focus()
+        observer.disconnect()
+    })
+
+    // Page fullyload in GC is indicated by change of jsdata to c-wiz to a higher value
+    // Should only happen once
+    focusByDefault.observe(cwizElement, {attributes: true, attributeFilter: ["jsdata"]})
 }
 
 class UserOptions {
@@ -455,7 +472,7 @@ class AliasInject {
         })
 
         //Room Search Input Listener
-        inputs.singleSearch.addEventListener('keyup', (event) => {
+        inputs.singleSearch.addEventListener('keydown', (event) => {
             let roomNodeAll = this.cwizElement.querySelectorAll(roomNodeSelector)
             let ulResults = this.cwizElement.querySelector("ul.alias-class-results")
 
