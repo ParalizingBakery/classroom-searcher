@@ -251,9 +251,21 @@ function injectSearch(roomList) {
         console.error(reason)
     })
 
+    document.addEventListener("keyup", (event) => {
+        if (document.activeElement === searchBar) {
+            let input = searchBar.value.toLowerCase()
+            let roomNodes = roomList.querySelectorAll(roomNodeSelector)
+            roomNodes.forEach((element) => {
+                if (matchRoom(element, input, userOptions.read())) {
+                    element.style.display = 'flex'
+                } else {
+                    element.style.display = 'none'
+                }
+            })
+        }
+    })
+
     document.addEventListener("keydown", (event) => {
-        //For some reason, browsers will select the teacher checkbox as the first active element
-        //Funky behavior
         if (event.key === "/") {
             //This checks whether home page is hidden. Useful for when pages have multiple
             //<c-wiz> elements and you only want to focus when <c-wiz> is visible
@@ -268,18 +280,6 @@ function injectSearch(roomList) {
             
             searchBar.focus()
             event.preventDefault()
-        }
-
-        if (document.activeElement === searchBar) {
-            let input = searchBar.value.toLowerCase()
-            let roomNodes = roomList.querySelectorAll(roomNodeSelector)
-            roomNodes.forEach((element) => {
-                if (matchRoom(element, input, userOptions.read())) {
-                    element.style.display = 'flex'
-                } else {
-                    element.style.display = 'none'
-                }
-            })
         }
     })
 
@@ -472,7 +472,7 @@ class AliasInject {
         })
 
         //Room Search Input Listener
-        inputs.singleSearch.addEventListener('keydown', (event) => {
+        inputs.singleSearch.addEventListener('keyup', (event) => {
             let roomNodeAll = this.cwizElement.querySelectorAll(roomNodeSelector)
             let ulResults = this.cwizElement.querySelector("ul.alias-class-results")
 
