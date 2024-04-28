@@ -730,13 +730,11 @@ class AliasInject {
         return updateArray.map((classId, index, array) => {
             let roomNode = getRoomNodeFromId(this.cwizElement, classId)
             if (!roomNode) {
-                console.error(`AliasInject.setOriginalNames() : roomNode not found from id ${classId}`)
                 return null
             }
             
             let roomName = roomNode.querySelector(roomNameSelector)?.textContent
             if (!roomName) {
-                console.error(`AliasInject.setOriginalNames() : roomName not found from roomNode with id ${classId}`)
                 return null
             }
 
