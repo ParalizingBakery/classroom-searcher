@@ -242,7 +242,7 @@ function injectSearch(roomList) {
         //Inject when changes to <c-wiz> attributes
         //When page is fully loaded, jsdata = "deferred-c3"
         //When page is returned to, aria-hidden is switched from false to true
-        AliasInjector.observe(classAlias.cwizElement,{attributes:true})
+        AliasInjector.observe(classAlias.cwizElement,{attributes:true, attributeFilter:["aria-hidden", "jsdata"]})
     
     }).catch((reason) => {
         console.error(reason)
