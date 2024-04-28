@@ -52,7 +52,7 @@ const html = `
     .modal-content {
         overflow: auto; /* Enable scroll if needed */;
         background-color: #fefefe;
-        margin: 15% auto; /* 15% from the top and centered */
+        margin: min(15%, 175px) auto; /* 15% from the top and centered */
         border: 1px solid #888;
         width: min(80%, 500px);
     }
@@ -147,11 +147,14 @@ const html = `
                 <p class="mb-1">
                     Rename classes from the source (what is stored in storage)
                 </p>
+                <ul class="mb-1">
+                    <li>Copy-Paste to other devices to "sync"</li>
+                    <li>JSON Format</li>
+                    <li>Classes with <code style="color:blue">null</code> <code>className</code> will be automatically removed.</li>
+                    <li><code>originalName</code> is trimmed off before storage to save space.</li>
+                </ul>
                 <p class="mb-1" style="color:red">
                     Edit at your own risk
-                </p>
-                <p class="mb-1">
-                    Copy-Paste to other devices to "sync"
                 </p>
                 <div class="mb-1">
                     <textarea class="modal-source-textarea full-width"></textarea>
