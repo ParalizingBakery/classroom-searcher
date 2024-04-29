@@ -278,6 +278,11 @@ function injectSearch(roomList) {
                 return
             }
             
+            // If user is pressing a modifier, do not
+            if (event.ctrlKey || event.metaKey || event.altKey) {
+                return
+            }
+            
             searchBar.focus()
             event.preventDefault()
         }
