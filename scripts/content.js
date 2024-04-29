@@ -692,10 +692,11 @@ class AliasInject {
             .then((result) => {
                 let storageAlias = result[storageAliasKey]
 
+                // Merge to not overwrite new aliases on other c-wizes
                 /** @type {Object.<string, classAlias>}*/
                 this.aliases = {
-                    ...this.aliases,
-                    ...storageAlias
+                    ...storageAlias,
+                    ...this.aliases
                 }
 
                 /** @type {classAlias}} */
