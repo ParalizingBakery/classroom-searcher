@@ -24,4 +24,9 @@ When ~pages~ c-wiz are fully loaded, the `jsdata` attribute of the c-wiz will be
 
 If you want to use data that is from the page, it is good to set a mutaitionObserver with attributeFilter of jsdata to call a function you want to use.
 
+## Future Improvements
+- Modularization
+- Separate html from code (fetch())
+- Keep track of roomNodes and their commonly used elements in memory instead of using querySeletor() multiple times
+
 Created by Wuttiphat Kiddee
