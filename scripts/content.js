@@ -1,9 +1,24 @@
 //May change when Google Classroom updates UI
-const roomListSelector = ".JwPp0e"
-const roomNodeSelector = "li.gHz6xd.Aopndd"
-const roomNodeHeaderSelector = "div.Tc9hUd"
-const roomNameSelector = "div.YVvGBb.z3vRcc-ZoZQ1"
-const roomTeacherSelector = "div.Vx8Sxd.YVvGBb.jJIbcc"
+let roomListSelector
+let roomNodeSelector
+let roomNodeHeaderSelector
+let roomNameSelector
+let roomTeacherSelector
+
+async function getSyncVars() {
+    result = await browser.storage.sync.get({
+        "sel-class": "div.ScpeUc.Vu2fZd.z3vRcc-ZoZQ1",
+        "sel-teacher": "div.z07MGc.Vu2fZd.jJIbcc",
+        "sel-roomlist": ".JwPp0e",
+        "sel-node": "li.gHz6xd.Aopndd",
+        "sel-header": "div.Tc9hUd"
+    });
+    roomNameSelector = result["sel-class"]
+    roomTeacherSelector = result["sel-teacher"]
+    roomListSelector = result["sel-roomlist"]
+    roomNodeSelector = result["sel-node"]
+    roomNodeHeaderSelector = result["sel-header"]
+}
 
 //Classes and Id for elements in html that is queried in code
 const searchAppClass = "searchapp"
@@ -18,9 +33,9 @@ const storageAliasKey = "class_aliases"
 //if class or id of element is changed, also change selector in injectsearch()
 //disabled button in form to prevent submitting form when pressing enter
 const html = `
-<div class="${searchAppClass}">
+<div class="searchapp">
     <style>
-    .${searchAppClass} {
+    .searchapp {
         display: flex;
         justify-content: space-between;
         margin-left: 1.5rem;
@@ -29,7 +44,7 @@ const html = `
         line-height: normal;
     }
 
-    .${searchAppClass} :focus {
+    .searchapp :focus {
         outline: 1px solid
     }
 
@@ -99,12 +114,12 @@ const html = `
     </style>
     <div>
         <legend> Search using 
-        <input type="checkbox" id="${classCheckboxId}" checked autocomplete="off"></input>
+        <input type="checkbox" id="classCheckbox" checked autocomplete="off"></input>
         <strong>Class name </strong> or
-        <input type="checkbox" id="${teacherCheckboxId}" checked autocomplete="off"></input>
+        <input type="checkbox" id="teacherCheckbox" checked autocomplete="off"></input>
         <strong>Teacher name</strong></legend>
         <legend>/ to focus, Tab 2x + Enter for first result</legend>
-        <input id="${inputBarId}" type="search" autofocus>
+        <input id="searchbar" type="search" autofocus>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
     </div>
     <div>
@@ -178,8 +193,11 @@ const html = `
  */
 
 function main(){
+    // added this because of async might be slow (added observer long after evrything's finished)
+    bodyChildChange()
     //the parameter for callback is iterable, if you want to do smth for each mutaition please use for .. of ..
     //doing this for every mutation in record is redundant for now
+    
     const observer = new MutationObserver(bodyChildChange)
     //GC adds a new <c-wiz> element when you navigate to a new page (part?) of the website.
     //there may or may not be a new <c-wiz> with roomList everytime observer is triggered
@@ -190,7 +208,7 @@ function main(){
  * @param {MutationRecord[]} records 
  * @param {MutationObserver} observer 
  */
-function bodyChildChange (records, observer) {
+function bodyChildChange () {
     //Run for every observation
     let roomListAll = document.querySelectorAll(roomListSelector)
     roomListAll.forEach((roomList) => {
@@ -492,7 +510,7 @@ class AliasInject {
                 let roomNode = roomNodeAll[i]
 
                 //Doesn't match search
-                if (!matchRoom(roomNode, inputs.singleSearch.value, {matchTeacher: false})) {
+                if (!matchRoom(roomNode, inputs.singleSearch.value.toLowerCase(), {matchTeacher: false})) {
                     continue
                 }
 
@@ -836,4 +854,6 @@ function getRoomNodeFromId(scope, id) {
     return roomAnchor.closest(roomNodeSelector)
 }
 
-main()
+getSyncVars().then(()=> {
+    main()
+})

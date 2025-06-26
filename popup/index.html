@@ -3,6 +3,7 @@
     <head>
         <script src="/browser-polyfill.js"></script>
         <script src="permissions.js" defer></script>
+        <script src="buttons.js" defer></script>
         <link href="style.css" rel="stylesheet">
     </head>
     <body>
@@ -12,6 +13,20 @@
         Available on <strong>home page</strong> and <strong>archived page</strong>.
         Searching with teacher name is not supported if the user is a teacher.
         </p>
+        <div>
+            <h2>Change Element Selectors</h2>
+            <p>When the UI is inevitably changed, this tool might not work anymore. 
+                You can set your own element selectors here</p>
+            <button class="sel-show">Show</button>
+            <div class="sel-inputs" style="display: none;">
+                <p>Class Name: <input class="sel-class" placeholder="div.ScpeUc.Vu2fZd.z3vRcc-ZoZQ1" type="text" name="" id=""></p>
+                <p>Teacher Name: <input class="sel-teacher" placeholder="div.z07MGc.Vu2fZd.jJIbcc" type="text" name="" id=""></p>
+                <p>Class List (contains room Nodes): <input class="sel-roomlist" placeholder=".JwPp0e" type="text" name="" id=""></p>
+                <p>Class Node: <input class="sel-node" placeholder="li.gHz6xd.Aopndd" type="text" name="" id=""></p>
+                <p>Class Header (Contains anchor element): <input class="sel-header" placeholder="div.Tc9hUd" type="text" name="" id=""></p>
+            </div>
+
+        </div>
         <h2>Permissions</h2>
         <div>
             <p>

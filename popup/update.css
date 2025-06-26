@@ -1,0 +1,9 @@
+body {
+    font-size: large;
+}
+
+main {
+    max-width: 500px;
+    margin: auto;
+    margin-top: 3vh;
+}
